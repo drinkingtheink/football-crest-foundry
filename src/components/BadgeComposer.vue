@@ -43,6 +43,24 @@ function handleCursor(h) {
   return h.hx * h.hy > 0 ? 'nwse-resize' : 'nesw-resize'
 }
 
+// A single selected non-rect symbol gets corner-only, aspect-locked handles —
+// uniform scale so symbols never warp.
+const resizeSymbol = computed(() => {
+  if (props.selection.length !== 1 || props.selection[0].type !== 'symbol') return null
+  const sym = props.config.symbols.find(s => s.instanceId === props.selection[0].id)
+  return sym && sym.kind !== 'rect' ? sym : null
+})
+
+const CORNER_DIRS = [[-1, -1], [1, -1], [-1, 1], [1, 1]]
+function symbolHandles(sym) {
+  const r = (sym.rotation || 0) * Math.PI / 180
+  const cos = Math.cos(r), sin = Math.sin(r), h = sym.size / 2
+  return CORNER_DIRS.map(([hx, hy]) => {
+    const lx = hx * h, ly = hy * h
+    return { hx, hy, x: sym.x + lx * cos - ly * sin, y: sym.y + lx * sin + ly * cos }
+  })
+}
+
 const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds', 'ember', 'drag-start', 'drag-end'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
@@ -215,6 +233,23 @@ function startRectResize(e, hx, hy) {
   e.preventDefault()
 }
 
+// Resize a symbol uniformly by dragging a corner: the opposite corner holds
+// fixed, and `size` tracks the drag along the symbol's own (rotated) axes.
+function startSymbolResize(e, hx, hy) {
+  const sym = resizeSymbol.value
+  if (!sym) return
+  e.stopPropagation()
+  const r = (sym.rotation || 0) * Math.PI / 180
+  const u = { x: Math.cos(r), y: Math.sin(r) }
+  const v = { x: -Math.sin(r), y: Math.cos(r) }
+  const half = sym.size / 2
+  const alx = -hx * half, aly = -hy * half
+  const anchor = { x: sym.x + alx * u.x + aly * v.x, y: sym.y + alx * u.y + aly * v.y }
+  drag.value = { mode: 'resize-symbol', id: sym.instanceId, hx, hy, u, v, anchor }
+  emit('drag-start')
+  e.preventDefault()
+}
+
 function onMove(e) {
   if (!drag.value) return
 
@@ -227,6 +262,20 @@ function onMove(e) {
     const cx = anchor.x + (hx * newW / 2) * u.x + (hy * newH / 2) * v.x
     const cy = anchor.y + (hx * newW / 2) * u.y + (hy * newH / 2) * v.y
     emit('update-symbol', drag.value.id, { w: Math.round(newW), h: Math.round(newH), x: cx, y: cy })
+    emit('ember', e.clientX, e.clientY)
+    return
+  }
+
+  if (drag.value.mode === 'resize-symbol') {
+    const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
+    const { hx, hy, u, v, anchor } = drag.value
+    const ax = pt.x - anchor.x, ay = pt.y - anchor.y
+    const distU = (ax * u.x + ay * u.y) * hx   // pointer projection onto each local axis
+    const distV = (ax * v.x + ay * v.y) * hy
+    const newSize = Math.max(16, Math.min(240, Math.max(distU, distV)))  // uniform: track the larger
+    const cx = anchor.x + (hx * newSize / 2) * u.x + (hy * newSize / 2) * v.x
+    const cy = anchor.y + (hx * newSize / 2) * u.y + (hy * newSize / 2) * v.y
+    emit('update-symbol', drag.value.id, { size: Math.round(newSize), x: cx, y: cy })
     emit('ember', e.clientX, e.clientY)
     return
   }
@@ -774,6 +823,18 @@ const gradLine = computed(() => {
         class="resize-handle"
         :style="{ cursor: handleCursor(h) }"
         @mousedown="startRectResize($event, h.hx, h.hy)"
+      />
+    </g>
+
+    <!-- Corner resize handles for a single selected symbol (uniform / aspect-locked) -->
+    <g v-if="resizeSymbol" data-export-hide>
+      <circle
+        v-for="(h, i) in symbolHandles(resizeSymbol)"
+        :key="i"
+        :cx="h.x" :cy="h.y" r="3.4"
+        class="resize-handle"
+        :style="{ cursor: handleCursor(h) }"
+        @mousedown="startSymbolResize($event, h.hx, h.hy)"
       />
     </g>
 

@@ -1030,6 +1030,10 @@ function stepBg(dir) {
 
 <template>
   <div class="app">
+    <div class="mobile-gate" aria-hidden="true">
+      <LogoMark class="mobile-gate-logo" />
+      <p class="mobile-gate-msg">The Foundry works best on tablet and up — Thx CF mgmt</p>
+    </div>
     <AppBackground :type="appBg" :tone="patternTone" />
     <div
       v-if="imageBgTypes.has(appBg)"
@@ -1675,6 +1679,39 @@ function stepBg(dir) {
   overflow: hidden;
   color: #e8e8ec;
   font-family: system-ui, sans-serif;
+}
+
+.mobile-gate {
+  display: none;
+}
+@media (max-width: 768px) {
+  .mobile-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 32px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(2px);
+  }
+  .app .mobile-gate .mobile-gate-logo {
+    width: min(44vw, 220px);
+    height: auto;
+    aspect-ratio: 543.67 / 627.4;
+  }
+  .mobile-gate-msg {
+    margin: 0;
+    max-width: 22ch;
+    color: #e8e8ec;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
 }
 
 .app-body {
