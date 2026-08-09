@@ -536,6 +536,11 @@ async function doSaveSnapshot(name) {
     const saved = await saveSnapshot(name, config, svgEl)
     // A brand-new save becomes the active design — subsequent saves update it.
     activeDesign.value = { id: saved.id, name: saved.name, source: saved.source ?? 'local' }
+    // Share → Save → Create link: if Share kicked off this save, open the link now.
+    if (pendingShare.value) {
+      pendingShare.value = false
+      if (activeDesign.value.source === 'cloud') doShareDesign(activeDesign.value)
+    }
     return saved
   } catch (e) {
     if (e.code === 'QUOTA') {
@@ -567,6 +572,9 @@ const shareModalOpen = ref(false)
 const shareUrl = ref('')
 const shareBusy = ref(false)
 const sharingSnap = ref(null)
+// Set when Share was clicked on an unsaved crest: create the link right after
+// the save completes (Share → Save → Create link).
+const pendingShare = ref(false)
 
 async function doShareDesign(snap) {
   sharingSnap.value = snap
@@ -935,6 +943,24 @@ async function handleAccountClick() {
   }
 }
 
+// Toolbar Share: links are backed by a cloud design, so a crest must be signed
+// in + saved before it can be shared. Route the user to whichever step is next.
+function requestShare() {
+  if (!isSupabaseConfigured || !isSignedIn.value) {
+    addToast('Sign in to share your crest with a link.', { type: 'tip', duration: 4500 })
+    showAuth.value = true
+    return
+  }
+  const design = activeDesign.value
+  if (design?.source === 'cloud') {
+    doShareDesign(design)
+    return
+  }
+  // Unsaved crest: save first, then create the link automatically.
+  pendingShare.value = true
+  snapshotPanelRef.value?.startSave({ share: true })
+}
+
 // Signing in/out swaps the snapshot list between cloud and localStorage.
 // On first sign-in, migrate this browser's local designs into the account.
 watch(isSignedIn, async (signedIn) => {
@@ -1114,6 +1140,9 @@ function stepBg(dir) {
             </button>
             <button class="export-png-btn" :disabled="isExporting" @click="exportSvg" title="Download this crest as a self-contained SVG">
               {{ isExporting ? '…' : '⬇ SVG' }}
+            </button>
+            <button class="share-crest-btn" @click="requestShare" title="Share this crest with a link">
+              ⤴ Share
             </button>
             <button class="scene-toggle" @click="showScene = !showScene" title="Toggle scene controls">
               {{ showScene ? '▲ scene' : '▼ scene' }}
@@ -2118,6 +2147,7 @@ function stepBg(dir) {
 .start-over-btn,
 .swap-colors-btn,
 .export-png-btn,
+.share-crest-btn,
 .scene-toggle {
   display: inline-flex;
   align-items: center;
@@ -2137,6 +2167,7 @@ function stepBg(dir) {
 .start-over-btn:hover,
 .swap-colors-btn:hover,
 .export-png-btn:hover,
+.share-crest-btn:hover,
 .scene-toggle:hover {
   color: #111;
   background: rgba(232, 200, 74, 0.9);

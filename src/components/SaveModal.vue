@@ -1,12 +1,22 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 
 const props = defineProps({
   open: Boolean,
   saving: Boolean,
   defaultName: { type: String, default: '' },
   activeName: { type: String, default: '' },   // set when editing an existing design
+  forShare: Boolean,                            // save was kicked off by the Share button
 })
+
+const headline = computed(() =>
+  props.activeName ? 'Update crest' : (props.forShare ? 'Save so you can share' : 'Save crest'))
+const subtext = computed(() =>
+  props.activeName
+    ? 'Save your changes to this crest, or keep a separate copy.'
+    : (props.forShare
+      ? 'Name your crest and save it — then we’ll create your share link.'
+      : 'Name this design so you can revisit it later.'))
 const emit = defineEmits(['save', 'update', 'close'])
 
 const name = ref('')
@@ -46,8 +56,8 @@ function saveCopy() {
           </span>
           <button class="save-close" title="Close" @click="$emit('close')">×</button>
 
-          <h2 class="save-title"><span class="hammer">⚒</span> <span class="molten">{{ activeName ? 'Update crest' : 'Save crest' }}</span></h2>
-          <p class="save-text">{{ activeName ? 'Save your changes to this crest, or keep a separate copy.' : 'Name this design so you can revisit it later.' }}</p>
+          <h2 class="save-title"><span class="hammer">⚒</span> <span class="molten">{{ headline }}</span></h2>
+          <p class="save-text">{{ subtext }}</p>
 
           <form class="save-form" @submit.prevent="submit">
             <input

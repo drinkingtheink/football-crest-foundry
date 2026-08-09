@@ -25,6 +25,7 @@ async function copyConfig(snap) {
 const snapshots = ref([])
 const saving = ref(false)
 const showSaveModal = ref(false)
+const saveForShare = ref(false)
 const defaultName = ref('')
 
 const loading = ref(false)
@@ -41,7 +42,8 @@ async function refresh() {
 defineExpose({ refresh, startSave })
 onMounted(refresh)
 
-function startSave() {
+function startSave(opts) {
+  saveForShare.value = !!opts?.share
   defaultName.value = props.activeDesign?.name || `Design ${new Date().toLocaleDateString()}`
   showSaveModal.value = true
 }
@@ -110,9 +112,10 @@ async function handleClearCloud() {
       :saving="saving"
       :default-name="defaultName"
       :active-name="activeDesign?.name || ''"
+      :for-share="saveForShare"
       @save="confirmSave"
       @update="confirmUpdate"
-      @close="showSaveModal = false"
+      @close="showSaveModal = false; saveForShare = false"
     />
 
     <p v-if="loading && !snapshots.length" class="snap-empty">Loading…</p>
