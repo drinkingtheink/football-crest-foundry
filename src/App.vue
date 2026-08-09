@@ -668,6 +668,11 @@ function onCloseShared() {
   sharedActive.value = false
 }
 
+function stepSharedBg(dir) {
+  const idx = bgOptions.findIndex(o => o.id === sharedBg.value)
+  sharedBg.value = bgOptions[(idx + dir + bgOptions.length) % bgOptions.length].id
+}
+
 const isPulsing      = ref(false)
 const isBadgeActive  = ref(false)
 let   sparkField     = null
@@ -1010,6 +1015,7 @@ function stepBg(dir) {
       :overlay="imageBgTypes.has(sharedBg) ? overlay : null"
       @remix="onRemixShared"
       @close="onCloseShared"
+      @step-bg="stepSharedBg"
     />
     <main class="app-body">
       <!-- Preview -->

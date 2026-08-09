@@ -14,7 +14,7 @@ const props = defineProps({
   tone: { type: String, default: 'dark' },
   overlay: { type: Object, default: null },   // { color, opacity } for image backgrounds
 })
-const emit = defineEmits(['remix', 'close'])
+const emit = defineEmits(['remix', 'close', 'step-bg'])
 
 const composerRef = ref(null)
 const exporting = ref(false)
@@ -38,6 +38,9 @@ async function download(format) {
   <div class="shared-view">
     <AppBackground :type="bgType" :tone="tone" />
     <div v-if="overlay" class="shared-overlay" :style="{ background: overlay.color, opacity: overlay.opacity }" />
+
+    <button class="shared-bg-arrow left" title="Previous background" @click="emit('step-bg', -1)">‹</button>
+    <button class="shared-bg-arrow right" title="Next background" @click="emit('step-bg', 1)">›</button>
 
     <div class="shared-logo">
       <LogoMark class="shared-logo-mark" />
@@ -91,6 +94,32 @@ async function download(format) {
   z-index: 1;
   pointer-events: none;
 }
+
+/* Browse backgrounds, mirroring the editor's bg arrows */
+.shared-bg-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+  padding: 10px 14px;
+  user-select: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.shared-bg-arrow:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.shared-bg-arrow.left  { left: 14px; }
+.shared-bg-arrow.right { right: 14px; }
 
 .shared-logo {
   position: fixed;
