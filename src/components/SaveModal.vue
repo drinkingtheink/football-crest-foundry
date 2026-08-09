@@ -5,8 +5,9 @@ const props = defineProps({
   open: Boolean,
   saving: Boolean,
   defaultName: { type: String, default: '' },
+  activeName: { type: String, default: '' },   // set when editing an existing design
 })
-const emit = defineEmits(['save', 'close'])
+const emit = defineEmits(['save', 'update', 'close'])
 
 const name = ref('')
 const fieldRef = ref(null)
@@ -20,7 +21,14 @@ watch(() => props.open, async (v) => {
   }
 })
 
+// Primary action: update in place when editing, else create new.
 function submit() {
+  const trimmed = name.value.trim()
+  if (!trimmed || props.saving) return
+  emit(props.activeName ? 'update' : 'save', trimmed)
+}
+
+function saveCopy() {
   const trimmed = name.value.trim()
   if (!trimmed || props.saving) return
   emit('save', trimmed)
@@ -38,8 +46,8 @@ function submit() {
           </span>
           <button class="save-close" title="Close" @click="$emit('close')">×</button>
 
-          <h2 class="save-title"><span class="hammer">⚒</span> <span class="molten">Save crest</span></h2>
-          <p class="save-text">Name this design so you can revisit it later.</p>
+          <h2 class="save-title"><span class="hammer">⚒</span> <span class="molten">{{ activeName ? 'Update crest' : 'Save crest' }}</span></h2>
+          <p class="save-text">{{ activeName ? 'Save your changes to this crest, or keep a separate copy.' : 'Name this design so you can revisit it later.' }}</p>
 
           <form class="save-form" @submit.prevent="submit">
             <input
@@ -51,9 +59,10 @@ function submit() {
             />
             <div class="save-actions">
               <button type="button" class="save-cancel" @click="$emit('close')">Cancel</button>
+              <button v-if="activeName" type="button" class="save-copy" :disabled="saving || !name.trim()" @click="saveCopy">Save a copy</button>
               <button type="submit" class="save-confirm" :class="{ forging: saving }" :disabled="saving || !name.trim()">
                 <svg class="save-bolt" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z" fill="currentColor"/></svg>
-                <span>{{ saving ? 'Forging…' : 'Save' }}</span>
+                <span>{{ saving ? 'Forging…' : (activeName ? 'Update' : 'Save') }}</span>
                 <span class="forge-embers" aria-hidden="true">
                   <i class="fember f1" /><i class="fember f2" /><i class="fember f3" /><i class="fember f4" /><i class="fember f5" /><i class="fember f6" />
                 </span>
@@ -218,7 +227,20 @@ function submit() {
 }
 .save-input:focus { border-color: var(--accent-warm); }
 
-.save-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.save-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+
+.save-copy {
+  background: #1e1e28;
+  border: 1px solid #3a3a4a;
+  border-radius: 6px;
+  color: #bbb;
+  font-size: 13px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.save-copy:hover:not(:disabled) { color: var(--accent-warm); border-color: var(--accent-warm); }
+.save-copy:disabled { opacity: 0.5; cursor: default; }
 
 .save-cancel {
   background: #1e1e28;

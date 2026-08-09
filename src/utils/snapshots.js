@@ -35,6 +35,24 @@ export async function saveSnapshot(name, config, svgEl) {
     : saveLocal(name, cleanConfig, thumbnail)
 }
 
+// Update an existing snapshot in place (routed by its store, not current auth,
+// since cloud ids and local ids live in different namespaces).
+export async function updateSnapshot(id, source, name, config, svgEl) {
+  const thumbnail = svgEl ? await captureThumb(svgEl, config.texts) : null
+  const cleanConfig = JSON.parse(JSON.stringify(config))
+  if (source === 'cloud') {
+    const { data, error } = await supabase
+      .from('designs')
+      .update({ title: name, config: cleanConfig, thumbnail_url: thumbnail })
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) throw error
+    return fromRow(data)
+  }
+  return updateLocal(id, name, cleanConfig, thumbnail)
+}
+
 export async function listSnapshots() {
   const uid = await currentUserId()
   if (uid) {
@@ -125,6 +143,18 @@ function saveLocal(name, config, thumbnail) {
   const entry = { id, name, timestamp: Date.now(), config, thumbnail, source: 'local' }
   try {
     localStorage.setItem(PREFIX + id, JSON.stringify(entry))
+  } catch (e) {
+    if (isQuotaError(e)) { const err = new Error('Storage full'); err.code = 'QUOTA'; throw err }
+    throw e
+  }
+  return entry
+}
+
+function updateLocal(id, name, config, thumbnail) {
+  const entry = { id, name, timestamp: Date.now(), config, thumbnail, source: 'local' }
+  try {
+    localStorage.setItem(PREFIX + id, JSON.stringify(entry))
+    localStorage.removeItem(LEGACY_PREFIX + id)   // fold any legacy-keyed original into the canonical key
   } catch (e) {
     if (isQuotaError(e)) { const err = new Error('Storage full'); err.code = 'QUOTA'; throw err }
     throw e

@@ -13,7 +13,7 @@ import AboutModal from './components/AboutModal.vue'
 import AuthModal from './components/AuthModal.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { useAuth } from './composables/useAuth.js'
-import { saveSnapshot, importLocalToCloud } from './utils/snapshots.js'
+import { saveSnapshot, updateSnapshot, importLocalToCloud } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
@@ -545,16 +545,39 @@ const particleCanvas  = ref(null)
 const badgeWrap       = ref(null)
 const snapshotPanelRef = ref(null)
 
+// The saved design currently being edited (set on load / after a save), so the
+// next save can update it in place rather than spawn a copy. Cleared when a
+// fresh crest is forged.
+const activeDesign = ref(null)   // { id, name, source } | null
+
 async function doSaveSnapshot(name) {
   const svgEl = badgeWrap.value?.querySelector('svg')
   try {
-    return await saveSnapshot(name, config, svgEl)
+    const saved = await saveSnapshot(name, config, svgEl)
+    // A brand-new save becomes the active design — subsequent saves update it.
+    activeDesign.value = { id: saved.id, name: saved.name, source: saved.source ?? 'local' }
+    return saved
   } catch (e) {
     if (e.code === 'QUOTA') {
       addToast('Snapshot storage is full — delete a few snapshots and try again.', { type: 'tip', duration: 6000 })
       return false
     }
     addToast('Couldn’t save your crest — please try again.', { type: 'error' })
+    return false
+  }
+}
+
+async function doUpdateSnapshot(name) {
+  const target = activeDesign.value
+  if (!target) return doSaveSnapshot(name)
+  const svgEl = badgeWrap.value?.querySelector('svg')
+  try {
+    const updated = await updateSnapshot(target.id, target.source, name, config, svgEl)
+    activeDesign.value = { id: updated.id, name: updated.name, source: updated.source ?? target.source }
+    addToast(`Updated “${updated.name}”`, { type: 'success', duration: 2500 })
+    return updated
+  } catch (e) {
+    addToast('Couldn’t update your crest — please try again.', { type: 'error' })
     return false
   }
 }
@@ -734,10 +757,16 @@ function loadConfigFonts(cfg) {
   families.forEach(loadFont)
 }
 
-function onLoadSnapshot(cfg) {
-  loadConfig(cfg)
-  loadConfigFonts(cfg)
+function onLoadSnapshot(snap) {
+  loadConfig(snap.config)
+  loadConfigFonts(snap.config)
+  activeDesign.value = { id: snap.id, name: snap.name, source: snap.source ?? 'local' }
   isCurated.value = false // a loaded snapshot isn't the library's curated crest
+}
+
+// A saved design was deleted — if it was the one we're editing, stop tracking it.
+function onSnapshotDeleted(id) {
+  if (activeDesign.value?.id === id) activeDesign.value = null
 }
 
 function startOver() {
@@ -747,6 +776,8 @@ function startOver() {
 }
 
 function randomizeAll() {
+  // A forged crest is a new design, not an edit of whatever was loaded.
+  activeDesign.value = null
   // Small chance to surface a curated crest from the library instead of a
   // procedurally-generated one (loaded verbatim).
   if (crestLibrary.length && Math.random() < LIBRARY_CHANCE) {
@@ -1461,7 +1492,10 @@ function stepBg(dir) {
           <SnapshotPanel
             ref="snapshotPanelRef"
             :save-fn="doSaveSnapshot"
+            :update-fn="doUpdateSnapshot"
+            :active-design="activeDesign"
             @load="onLoadSnapshot"
+            @deleted="onSnapshotDeleted"
           />
         </div>
 

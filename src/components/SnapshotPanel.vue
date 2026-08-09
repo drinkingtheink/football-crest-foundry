@@ -4,8 +4,12 @@ import { listSnapshots, deleteSnapshot, clearCloudDesigns } from '../utils/snaps
 import { useToast } from '../composables/useToast.js'
 import SaveModal from './SaveModal.vue'
 
-const props = defineProps({ saveFn: { type: Function, required: true } })
-const emit = defineEmits(['load'])
+const props = defineProps({
+  saveFn: { type: Function, required: true },
+  updateFn: { type: Function, default: null },
+  activeDesign: { type: Object, default: null },
+})
+const emit = defineEmits(['load', 'deleted'])
 
 const { addToast } = useToast()
 
@@ -38,15 +42,15 @@ defineExpose({ refresh, startSave })
 onMounted(refresh)
 
 function startSave() {
-  defaultName.value = `Design ${new Date().toLocaleDateString()}`
+  defaultName.value = props.activeDesign?.name || `Design ${new Date().toLocaleDateString()}`
   showSaveModal.value = true
 }
 
-async function confirmSave(name) {
+async function runSave(fn, name) {
   saving.value = true
   try {
-    const saved = await props.saveFn(name)
-    if (saved === false) return   // save failed (e.g. storage full); keep the dialog open
+    const result = await fn(name)
+    if (result === false) return   // failed (e.g. storage full); keep the dialog open
     refresh()
     showSaveModal.value = false
   } finally {
@@ -54,7 +58,10 @@ async function confirmSave(name) {
   }
 }
 
-function handleLoad(snap) { emit('load', snap.config) }
+function confirmSave(name) { runSave(props.saveFn, name) }               // save a new copy
+function confirmUpdate(name) { runSave(props.updateFn || props.saveFn, name) } // update in place
+
+function handleLoad(snap) { emit('load', snap) }
 
 async function handleDelete(snap) {
   if (!window.confirm(`Delete "${snap.name}"?`)) return
@@ -64,6 +71,7 @@ async function handleDelete(snap) {
     addToast('Couldn’t delete that crest', { type: 'error' })
     return
   }
+  emit('deleted', snap.id)
   refresh()
 }
 
@@ -93,14 +101,17 @@ async function handleClearCloud() {
 <template>
   <div class="snapshot-panel">
     <div class="snap-header">
-      <button class="snap-save-btn" @click="startSave">+ Save Snapshot</button>
+      <button class="snap-save-btn" @click="startSave">{{ activeDesign ? 'Save changes' : '+ Save Snapshot' }}</button>
+      <p v-if="activeDesign" class="snap-editing" :title="activeDesign.name">Editing “{{ activeDesign.name }}”</p>
     </div>
 
     <SaveModal
       :open="showSaveModal"
       :saving="saving"
       :default-name="defaultName"
+      :active-name="activeDesign?.name || ''"
       @save="confirmSave"
+      @update="confirmUpdate"
       @close="showSaveModal = false"
     />
 
@@ -145,6 +156,16 @@ async function handleClearCloud() {
 
 <style scoped>
 .snap-header { margin-bottom: 10px; }
+
+.snap-editing {
+  margin: 6px 2px 0;
+  font-size: 10.5px;
+  color: var(--accent-warm);
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .snap-clear-cloud {
   display: block;
