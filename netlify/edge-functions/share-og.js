@@ -9,12 +9,21 @@ export default async (request, context) => {
   const response = await context.next()
   if (!token) return response
 
+  // Per-token responses must not be cached under the query-less key, or every
+  // token (and the default) would collide. Also tag the outcome for debugging.
+  const passthrough = (status) => {
+    const headers = new Headers(response.headers)
+    headers.set('x-share-og', status)
+    headers.set('cache-control', 'no-store')
+    return new Response(response.body, { status: response.status, headers })
+  }
+
   const contentType = response.headers.get('content-type') || ''
   if (!contentType.includes('text/html')) return response
 
   const SUPABASE_URL = Netlify.env.get('VITE_SUPABASE_URL')
   const SUPABASE_KEY = Netlify.env.get('VITE_SUPABASE_ANON_KEY')
-  if (!SUPABASE_URL || !SUPABASE_KEY) return response
+  if (!SUPABASE_URL || !SUPABASE_KEY) return passthrough('no-env')
 
   let design = null
   try {
@@ -27,16 +36,15 @@ export default async (request, context) => {
       },
       body: JSON.stringify({ token }),
     })
-    if (res.ok) {
-      const rows = await res.json()
-      design = Array.isArray(rows) ? rows[0] : rows
-    }
+    if (!res.ok) return passthrough(`rpc-${res.status}`)
+    const rows = await res.json()
+    design = Array.isArray(rows) ? rows[0] : rows
   } catch {
-    return response
+    return passthrough('rpc-error')
   }
 
-  // No crest, or it has no generated preview image yet → leave the defaults.
-  if (!design || !design.og_image_url) return response
+  if (!design) return passthrough('no-design')
+  if (!design.og_image_url) return passthrough('no-image')
 
   const esc = (s) => String(s || '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -66,6 +74,8 @@ export default async (request, context) => {
 
   const headers = new Headers(response.headers)
   headers.delete('content-length')
+  headers.set('x-share-og', 'injected')
+  headers.set('cache-control', 'no-store')
   return new Response(replaced, { status: response.status, headers })
 }
 

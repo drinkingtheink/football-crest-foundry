@@ -2,7 +2,5 @@
   command = "npm run build"
   publish = "dist"
 
-# Inject per-crest social-preview tags for shared links (?c=<token>).
-[[edge_functions]]
-  path = "/"
-  function = "share-og"
+# The share-og edge function is registered via its own inline `config.path`
+# (netlify/edge-functions/share-og.js) — no [[edge_functions]] entry needed.
