@@ -119,6 +119,46 @@ export const fonts = [
   { family: 'Bowlby One SC',   group: 'Display' },
   { family: 'Faster One',      group: 'Display' },
   { family: 'Monoton',         group: 'Display' },
+
+  // ── Expanded batch 2 (all verified on Fontsource for SVG-export outlining) ──
+  // Blackletter
+  { family: 'Germania One',     group: 'Blackletter' },
+  { family: 'Fruktur',          group: 'Blackletter' },
+  // Gothic / condensed
+  { family: 'Yanone Kaffeesatz',group: 'Gothic' },
+  { family: 'Roboto Condensed', group: 'Gothic' },
+  { family: 'Fira Sans Condensed', group: 'Gothic' },
+  { family: 'Homenaje',         group: 'Gothic' },
+  // Slab Serif
+  { family: 'Josefin Slab',     group: 'Slab Serif' },
+  { family: 'Slabo 27px',       group: 'Slab Serif' },
+  { family: 'Enriqueta',        group: 'Slab Serif' },
+  { family: 'Kelly Slab',       group: 'Slab Serif' },
+  // Classic Serif
+  { family: 'Cardo',            group: 'Classic Serif' },
+  { family: 'Alegreya',         group: 'Classic Serif' },
+  { family: 'Old Standard TT',  group: 'Classic Serif' },
+  { family: 'Cormorant',        group: 'Classic Serif' },
+  // Script (formal calligraphy — not casual handwriting)
+  { family: 'Alex Brush',       group: 'Script' },
+  { family: 'Tangerine',        group: 'Script' },
+  { family: 'Allura',           group: 'Script' },
+  // Military / Stencil
+  { family: 'Allerta Stencil',  group: 'Military' },
+  { family: 'Sirin Stencil',    group: 'Military' },
+  // Modern Geometric
+  { family: 'Rubik',            group: 'Modern' },
+  { family: 'Kanit',            group: 'Modern' },
+  { family: 'Oxanium',          group: 'Modern' },
+  { family: 'Aldrich',          group: 'Modern' },
+  { family: 'Electrolize',      group: 'Modern' },
+  // Display / Athletic
+  { family: 'Henny Penny',      group: 'Display' },
+  { family: 'Titan One',        group: 'Display' },
+  { family: 'Passion One',      group: 'Display' },
+  { family: 'Luckiest Guy',     group: 'Display' },
+  { family: 'Shrikhand',        group: 'Display' },
+  { family: 'Rammetto One',     group: 'Display' },
 ]
 
 export const fontsByGroup = Object.fromEntries(
