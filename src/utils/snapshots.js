@@ -1,16 +1,77 @@
+import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
+
 const PREFIX = 'crest-foundry:snap:'
 const LEGACY_PREFIX = 'crest-forge:snap:'
 
+// When signed in, snapshots live in the Supabase `designs` table; otherwise
+// they stay in localStorage. Same public API either way, so SnapshotPanel /
+// App don't care which backend answers.
+async function currentUserId() {
+  if (!isSupabaseConfigured) return null
+  const { data } = await supabase.auth.getSession()
+  return data.session?.user?.id ?? null
+}
+
+// designs row → the entry shape the UI expects.
+function fromRow(row) {
+  return {
+    id: row.id,
+    name: row.title ?? 'Untitled',
+    timestamp: new Date(row.updated_at ?? row.created_at).getTime(),
+    config: row.config,
+    thumbnail: row.thumbnail_url ?? null,
+  }
+}
+
 export async function saveSnapshot(name, config, svgEl) {
   const thumbnail = svgEl ? await captureThumb(svgEl) : null
-  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-  const entry = {
-    id,
-    name,
-    timestamp: Date.now(),
-    config: JSON.parse(JSON.stringify(config)),
-    thumbnail,
+  const cleanConfig = JSON.parse(JSON.stringify(config))
+  const uid = await currentUserId()
+  return uid
+    ? saveCloud(uid, name, cleanConfig, thumbnail)
+    : saveLocal(name, cleanConfig, thumbnail)
+}
+
+export async function listSnapshots() {
+  const uid = await currentUserId()
+  if (uid) {
+    const { data, error } = await supabase
+      .from('designs')
+      .select('*')
+      .order('updated_at', { ascending: false })
+    if (error) throw error
+    return data.map(fromRow)
   }
+  return listLocal()
+}
+
+export async function deleteSnapshot(id) {
+  const uid = await currentUserId()
+  if (uid) {
+    const { error } = await supabase.from('designs').delete().eq('id', id)
+    if (error) throw error
+    return
+  }
+  deleteLocal(id)
+}
+
+// --- Cloud (Supabase) ---
+
+async function saveCloud(uid, name, config, thumbnail) {
+  const { data, error } = await supabase
+    .from('designs')
+    .insert({ owner_id: uid, title: name, config, thumbnail_url: thumbnail })
+    .select()
+    .single()
+  if (error) throw error
+  return fromRow(data)
+}
+
+// --- Local (localStorage) ---
+
+function saveLocal(name, config, thumbnail) {
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  const entry = { id, name, timestamp: Date.now(), config, thumbnail }
   try {
     localStorage.setItem(PREFIX + id, JSON.stringify(entry))
   } catch (e) {
@@ -20,7 +81,7 @@ export async function saveSnapshot(name, config, svgEl) {
   return entry
 }
 
-export function listSnapshots() {
+function listLocal() {
   const results = []
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i)
@@ -38,7 +99,7 @@ export function listSnapshots() {
   return results.sort((a, b) => b.timestamp - a.timestamp)
 }
 
-export function deleteSnapshot(id) {
+function deleteLocal(id) {
   localStorage.removeItem(PREFIX + id)
   localStorage.removeItem(LEGACY_PREFIX + id)
 }

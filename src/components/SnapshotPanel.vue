@@ -23,7 +23,17 @@ const showNameInput = ref(false)
 const nameInput = ref('')
 const nameFieldRef = ref(null)
 
-function refresh() { snapshots.value = listSnapshots() }
+const loading = ref(false)
+async function refresh() {
+  loading.value = true
+  try {
+    snapshots.value = await listSnapshots()
+  } catch {
+    addToast('Couldn’t load your saved crests', { type: 'error' })
+  } finally {
+    loading.value = false
+  }
+}
 defineExpose({ refresh, startSave })
 onMounted(refresh)
 
@@ -58,9 +68,14 @@ function cancelSave() {
 
 function handleLoad(snap) { emit('load', snap.config) }
 
-function handleDelete(snap) {
+async function handleDelete(snap) {
   if (!window.confirm(`Delete "${snap.name}"?`)) return
-  deleteSnapshot(snap.id)
+  try {
+    await deleteSnapshot(snap.id)
+  } catch {
+    addToast('Couldn’t delete that crest', { type: 'error' })
+    return
+  }
   refresh()
 }
 
@@ -89,7 +104,8 @@ function formatDate(ts) {
       </div>
     </div>
 
-    <p v-if="!snapshots.length" class="snap-empty">No snapshots saved yet.<br>Save a snapshot to revisit this design later.</p>
+    <p v-if="loading && !snapshots.length" class="snap-empty">Loading…</p>
+    <p v-else-if="!snapshots.length" class="snap-empty">No snapshots saved yet.<br>Save a snapshot to revisit this design later.</p>
 
     <div v-else class="snap-grid">
       <div v-for="snap in snapshots" :key="snap.id" class="snap-card">

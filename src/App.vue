@@ -547,7 +547,8 @@ async function doSaveSnapshot(name) {
       addToast('Snapshot storage is full — delete a few snapshots and try again.', { type: 'tip', duration: 6000 })
       return false
     }
-    throw e
+    addToast('Couldn’t save your crest — please try again.', { type: 'error' })
+    return false
   }
 }
 const isPulsing      = ref(false)
@@ -813,6 +814,9 @@ async function handleAccountClick() {
     showAuth.value = true
   }
 }
+
+// Signing in/out swaps the snapshot list between cloud and localStorage.
+watch(isSignedIn, () => { snapshotPanelRef.value?.refresh() })
 
 const badgeComposerRef = ref(null)
 const isExporting = ref(false)
