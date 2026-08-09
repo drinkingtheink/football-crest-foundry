@@ -1,15 +1,36 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { icons, iconGroups, iconCats } from '../data/icons.js'
 
 const props = defineProps({
   // { [iconId]: count } — how many of each symbol are currently in the design
   placedCounts: { type: Object, default: () => ({}) },
+  // Gallery id of the selected canvas symbol; when set, scroll it into view
+  selectedIconId: { type: String, default: null },
 })
 const emit = defineEmits(['add-icon'])
 
 const search = ref('')
 const activeGroup = ref('All')
+
+// Button refs keyed by gallery id, so a selected symbol can be revealed here.
+const btnRefs = {}
+function setBtnRef(el, id) { if (el) btnRefs[id] = el; else delete btnRefs[id] }
+const flashId = ref(null)
+
+// When a symbol is selected on the canvas, jump the gallery to All, drop any
+// search filter that would hide it, then scroll to and briefly flash its tile.
+watch(() => props.selectedIconId, async id => {
+  if (!id) return
+  activeGroup.value = 'All'
+  search.value = ''
+  await nextTick()
+  const el = btnRefs[id]
+  if (!el) return
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  flashId.value = id
+  setTimeout(() => { if (flashId.value === id) flashId.value = null }, 1200)
+})
 
 // Tooltip teleported to <body> and fixed to the viewport, so it isn't clipped
 // by the scrollable icon grid (overflow-y) — which cut off the top row's labels.
@@ -63,7 +84,9 @@ const showRectTile = computed(() => {
       <div class="icon-grid">
         <button
           v-if="showRectTile"
+          :ref="el => setBtnRef(el, 'shape:rect')"
           class="icon-btn"
+          :class="{ flash: flashId === 'shape:rect' }"
           @click="$emit('add-icon', 'shape:rect')"
           @mouseenter="showTip($event, 'Rectangle')"
           @mouseleave="hideTip"
@@ -75,8 +98,9 @@ const showRectTile = computed(() => {
         <button
           v-for="ic in filtered"
           :key="ic.id"
+          :ref="el => setBtnRef(el, ic.id)"
           class="icon-btn"
-          :class="{ placed: placedCounts[ic.id] > 0 }"
+          :class="{ placed: placedCounts[ic.id] > 0, flash: flashId === ic.id }"
           @click="$emit('add-icon', ic.id)"
           @mouseenter="showTip($event, ic.label)"
           @mouseleave="hideTip"
@@ -193,6 +217,22 @@ const showRectTile = computed(() => {
   background: #252530;
   border-color: #e8c84a;
   color: #e8c84a;
+}
+
+/* Briefly spotlight the tile of a just-selected canvas symbol */
+.icon-btn.flash {
+  border-color: #4bd6e8;
+  color: #4bd6e8;
+  background: rgba(75, 214, 232, 0.12);
+  animation: icon-flash 1.2s ease-out;
+}
+@keyframes icon-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(75, 214, 232, 0.6); }
+  35%  { box-shadow: 0 0 10px 2px rgba(75, 214, 232, 0.55); }
+  100% { box-shadow: 0 0 0 0 rgba(75, 214, 232, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .icon-btn.flash { animation: none; }
 }
 
 /* Symbols already placed in the design */

@@ -146,6 +146,13 @@ const placedIconCounts = computed(() => {
   return counts
 })
 
+// The gallery id of the currently-selected symbol, so IconPicker can reveal it.
+const selectedIconId = computed(() => {
+  const sym = selectedSymbolId.value && config.symbols.find(s => s.instanceId === selectedSymbolId.value)
+  if (!sym) return null
+  return sym.kind === 'rect' ? 'shape:rect' : sym.iconId
+})
+
 function applyClub(club) {
   setPalette(club.colors.map(c => c.hex))
   activeClub.value = club
@@ -1279,7 +1286,7 @@ function stepBg(dir) {
         <!-- Symbol Gallery -->
         <div class="control-group">
           <h3 class="control-label">Add Symbol</h3>
-          <IconPicker :placed-counts="placedIconCounts" @add-icon="onPickIcon" />
+          <IconPicker :placed-counts="placedIconCounts" :selected-icon-id="selectedIconId" @add-icon="onPickIcon" />
         </div>
 
         <!-- Placed Symbols -->
