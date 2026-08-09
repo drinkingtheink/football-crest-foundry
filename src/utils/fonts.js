@@ -7,7 +7,6 @@ export const fontGroups = [
   'Military',
   'Modern',
   'Display',
-  'Handwritten',
 ]
 
 export const fonts = [
@@ -120,21 +119,15 @@ export const fonts = [
   { family: 'Bowlby One SC',   group: 'Display' },
   { family: 'Faster One',      group: 'Display' },
   { family: 'Monoton',         group: 'Display' },
-  // Handwritten
-  { family: 'Caveat',              group: 'Handwritten' },
-  { family: 'Shadows Into Light',  group: 'Handwritten' },
-  { family: 'Patrick Hand',        group: 'Handwritten' },
-  { family: 'Gochi Hand',          group: 'Handwritten' },
-  { family: 'Neucha',              group: 'Handwritten' },
 ]
 
 export const fontsByGroup = Object.fromEntries(
   fontGroups.map(g => [g, fonts.filter(f => f.group === g)])
 )
 
-// Fonts eligible for random crest generation. Handwritten styles are excluded —
-// too informal for a crest, so they're last-choice / manual-pick only.
-export const randomFonts = fonts.filter(f => f.group !== 'Handwritten')
+// Fonts eligible for random crest generation — the full registry. (Handwritten
+// styles were removed entirely as too informal for a crest.)
+export const randomFonts = fonts
 
 // These are pre-loaded via <link> in index.html; mark them to skip the dynamic inject
 const loaded = new Set(['EB Garamond', 'Cormorant Garamond', 'Yeseva One'])
