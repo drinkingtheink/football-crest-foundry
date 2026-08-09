@@ -10,7 +10,9 @@ import ClubPicker from './components/ClubPicker.vue'
 import AppBackground from './components/AppBackground.vue'
 import SnapshotPanel from './components/SnapshotPanel.vue'
 import AboutModal from './components/AboutModal.vue'
+import AuthModal from './components/AuthModal.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
+import { useAuth } from './composables/useAuth.js'
 import { saveSnapshot } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
@@ -800,6 +802,17 @@ function randomizeAll() {
 
 const showScene = ref(true)
 const showAbout = ref(false)
+const showAuth = ref(false)
+const { isSignedIn, email: authEmail, signOut, isSupabaseConfigured } = useAuth()
+
+async function handleAccountClick() {
+  if (isSignedIn.value) {
+    await signOut()
+    addToast('Signed out', { type: 'success', duration: 2500 })
+  } else {
+    showAuth.value = true
+  }
+}
 
 const badgeComposerRef = ref(null)
 const isExporting = ref(false)
@@ -1034,6 +1047,13 @@ function stepBg(dir) {
             </div>
           </div>
           <div class="logo-actions">
+            <button
+              v-if="isSupabaseConfigured"
+              class="account-btn"
+              :class="{ 'is-in': isSignedIn }"
+              :title="isSignedIn ? `Signed in as ${authEmail} — click to sign out` : 'Sign in to save crests to the cloud'"
+              @click="handleAccountClick"
+            >{{ isSignedIn ? '⏻ Sign out' : '⇲ Sign in' }}</button>
             <button class="about-btn" title="About &amp; credits" @click="showAbout = true">ⓘ</button>
           </div>
         </div>
@@ -1418,6 +1438,7 @@ function stepBg(dir) {
     </main>
 
     <AboutModal :open="showAbout" @close="showAbout = false" />
+    <AuthModal :open="showAuth" @close="showAuth = false" />
   </div>
 </template>
 
@@ -1559,6 +1580,31 @@ function stepBg(dir) {
 .about-btn:hover {
   border-color: #e8c84a;
   color: #e8c84a;
+}
+
+.account-btn {
+  background: none;
+  border: 1px solid #3a3a4a;
+  border-radius: 6px;
+  color: #888;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  padding: 5px 8px;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+.account-btn:hover {
+  border-color: #e8c84a;
+  color: #e8c84a;
+}
+.account-btn.is-in {
+  border-color: rgba(232, 200, 74, 0.4);
+  color: #e8c84a;
+}
+.account-btn.is-in:hover {
+  border-color: #e05555;
+  color: #e05555;
 }
 
 .forge-block {
