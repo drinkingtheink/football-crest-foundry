@@ -9,7 +9,7 @@ const props = defineProps({
   updateFn: { type: Function, default: null },
   activeDesign: { type: Object, default: null },
 })
-const emit = defineEmits(['load', 'deleted'])
+const emit = defineEmits(['load', 'deleted', 'share'])
 
 const { addToast } = useToast()
 
@@ -139,6 +139,7 @@ async function handleClearCloud() {
         </div>
         <div class="snap-actions">
           <button class="snap-load-btn" @click="handleLoad(snap)">Load</button>
+          <button v-if="snap.source === 'cloud'" class="snap-share-btn" @click="emit('share', snap)" title="Share link">↗</button>
           <button class="snap-copy-btn" @click="copyConfig(snap)" title="Copy crest config (JSON)">{ }</button>
           <button class="snap-del-btn" @click="handleDelete(snap)" title="Delete">✕</button>
         </div>
@@ -296,6 +297,19 @@ async function handleClearCloud() {
   transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
 .snap-load-btn:hover { background: #e8c84a; color: #111; border-color: #e8c84a; }
+
+.snap-share-btn {
+  background: none;
+  border: 1px solid #3a3a4a;
+  border-radius: 4px;
+  color: #888;
+  font-size: 13px;
+  padding: 3px 7px;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.snap-share-btn:hover { color: var(--accent-warm); border-color: var(--accent-warm); box-shadow: 0 0 8px var(--accent-warm-glow); }
 
 .snap-copy-btn {
   background: none;

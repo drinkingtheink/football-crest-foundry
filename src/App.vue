@@ -13,7 +13,9 @@ import AboutModal from './components/AboutModal.vue'
 import AuthModal from './components/AuthModal.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { useAuth } from './composables/useAuth.js'
-import { saveSnapshot, updateSnapshot, importLocalToCloud } from './utils/snapshots.js'
+import { saveSnapshot, updateSnapshot, importLocalToCloud, shareDesign, unshareDesign, getSharedDesign } from './utils/snapshots.js'
+import ShareModal from './components/ShareModal.vue'
+import SharedView from './components/SharedView.vue'
 import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
@@ -581,6 +583,88 @@ async function doUpdateSnapshot(name) {
     return false
   }
 }
+
+// --- Sharing ---
+const shareModalOpen = ref(false)
+const shareUrl = ref('')
+const shareBusy = ref(false)
+const sharingSnap = ref(null)
+
+async function doShareDesign(snap) {
+  sharingSnap.value = snap
+  shareUrl.value = ''
+  shareBusy.value = true
+  shareModalOpen.value = true
+  try {
+    const { url } = await shareDesign(snap.id)
+    shareUrl.value = url
+  } catch (e) {
+    shareModalOpen.value = false
+    addToast('Couldn’t create a share link — please try again.', { type: 'error' })
+  } finally {
+    shareBusy.value = false
+  }
+}
+
+async function doRevokeShare() {
+  const snap = sharingSnap.value
+  if (!snap) return
+  try {
+    await unshareDesign(snap.id)
+    addToast('Sharing turned off', { type: 'success', duration: 2500 })
+    shareModalOpen.value = false
+  } catch {
+    addToast('Couldn’t stop sharing — please try again.', { type: 'error' })
+  }
+}
+
+// --- Shared view (opening a ?c=<token> link) ---
+const sharedActive  = ref(new URLSearchParams(location.search).has('c'))
+const sharedLoading = ref(sharedActive.value)
+const sharedError   = ref(false)
+const sharedConfig  = ref(null)
+const sharedName    = ref('')
+
+onMounted(async () => {
+  if (!sharedActive.value) return
+  const token = new URLSearchParams(location.search).get('c')
+  try {
+    const d = await getSharedDesign(token)
+    if (d) {
+      sharedConfig.value = d.config
+      sharedName.value = d.name
+      loadConfigFonts(d.config)          // so the shared crest renders in its real fonts
+      document.title = `${d.name} — Crest Foundry`
+    } else {
+      sharedError.value = true
+    }
+  } catch {
+    sharedError.value = true
+  } finally {
+    sharedLoading.value = false
+  }
+})
+
+function clearShareParam() {
+  history.replaceState(null, '', location.pathname)
+  document.title = 'Crest Foundry — Club Crest Creator'
+}
+
+function onRemixShared() {
+  if (sharedConfig.value) {
+    loadConfig(sharedConfig.value)
+    loadConfigFonts(sharedConfig.value)
+    activeDesign.value = null   // a remix is a fresh design, not an edit of the original
+  }
+  clearShareParam()
+  sharedActive.value = false
+}
+
+function onCloseShared() {
+  clearShareParam()
+  sharedActive.value = false
+}
+
 const isPulsing      = ref(false)
 const isBadgeActive  = ref(false)
 let   sparkField     = null
@@ -912,6 +996,15 @@ function stepBg(dir) {
       :style="{ background: overlay.color, opacity: overlay.opacity }"
     />
     <ToastContainer />
+    <SharedView
+      v-if="sharedActive"
+      :config="sharedConfig"
+      :name="sharedName"
+      :loading="sharedLoading"
+      :error="sharedError"
+      @remix="onRemixShared"
+      @close="onCloseShared"
+    />
     <main class="app-body">
       <!-- Preview -->
       <section class="preview-pane" @wheel.prevent="forwardScroll" @mousemove="onStageMove" @mouseenter="isBadgeActive = true" @mouseleave="isBadgeActive = false">
@@ -1496,12 +1589,20 @@ function stepBg(dir) {
             :active-design="activeDesign"
             @load="onLoadSnapshot"
             @deleted="onSnapshotDeleted"
+            @share="doShareDesign"
           />
         </div>
 
       </aside>
     </main>
 
+    <ShareModal
+      :open="shareModalOpen"
+      :url="shareUrl"
+      :busy="shareBusy"
+      @close="shareModalOpen = false"
+      @revoke="doRevokeShare"
+    />
     <AboutModal :open="showAbout" @close="showAbout = false" />
     <AuthModal :open="showAuth" @close="showAuth = false" />
   </div>

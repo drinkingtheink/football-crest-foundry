@@ -110,6 +110,46 @@ async function _doImport() {
   return { imported }
 }
 
+// --- Sharing (link-only / unlisted) ---
+
+function makeShareToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(9)) // 72 bits, unguessable
+  let s = ''
+  for (const b of bytes) s += String.fromCharCode(b)
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+// Ensure a cloud design has a share link and is shared. Reuses an existing
+// token so the URL is stable across shares. Returns { token, url }.
+export async function shareDesign(id) {
+  const { data: existing, error: e1 } = await supabase
+    .from('designs').select('share_token').eq('id', id).single()
+  if (e1) throw e1
+
+  const token = existing?.share_token || makeShareToken()
+  const { error } = await supabase
+    .from('designs')
+    .update({ share_token: token, is_shared: true, shared_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+  return { token, url: `${location.origin}/?c=${token}` }
+}
+
+export async function unshareDesign(id) {
+  const { error } = await supabase.from('designs').update({ is_shared: false }).eq('id', id)
+  if (error) throw error
+}
+
+// Resolve a share link (anon-safe RPC). Returns the crest, or null if the link
+// is invalid / no longer shared.
+export async function getSharedDesign(token) {
+  const { data, error } = await supabase.rpc('get_shared_design', { token })
+  if (error) throw error
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row) return null
+  return { id: row.id, name: row.title ?? 'Untitled', config: row.config, thumbnail: row.thumbnail_url ?? null }
+}
+
 // Delete every cloud design belonging to the signed-in user. RLS already
 // scopes deletes to the owner; the explicit owner_id filter is belt-and-suspenders.
 export async function clearCloudDesigns() {
