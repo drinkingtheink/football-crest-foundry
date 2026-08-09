@@ -293,8 +293,11 @@ export function useBadgeConfig() {
   function loadConfig(saved) {
     // Clone so the live config never aliases the source — library entries are
     // in-memory constants; without this, editing/recolouring a loaded crest
-    // would mutate the library object and corrupt future forges.
-    saved = structuredClone(saved)
+    // would mutate the library object and corrupt future forges. JSON-clone
+    // (not structuredClone) because saved may be a Vue reactive proxy — from a
+    // snapshot list held in a ref — which structuredClone can't clone. Config
+    // is always JSON-serializable (it's persisted as JSON/jsonb).
+    saved = JSON.parse(JSON.stringify(saved))
     config.shapeId = saved.shapeId
     config.noShield = saved.noShield ?? false
     config.palette.splice(0, config.palette.length, ...saved.palette)
