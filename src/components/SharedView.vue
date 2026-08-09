@@ -64,15 +64,17 @@ async function download(format) {
           <BadgeComposer ref="composerRef" :config="config" :size="420" uid="shared" />
         </div>
 
-        <h1 v-if="name" class="shared-name">{{ name }}</h1>
+        <div class="shared-panel">
+          <h1 v-if="name" class="shared-name">{{ name }}</h1>
 
-        <div class="shared-actions">
-          <button class="shared-primary" @click="emit('remix')">Remix this crest</button>
-          <button class="shared-btn" :disabled="exporting" @click="download('png')">{{ exporting ? '…' : '⬇ PNG' }}</button>
-          <button class="shared-btn" :disabled="exporting" @click="download('svg')">{{ exporting ? '…' : '⬇ SVG' }}</button>
+          <div class="shared-actions">
+            <button class="shared-primary" @click="emit('remix')">Remix this crest</button>
+            <button class="shared-btn" :disabled="exporting" @click="download('png')">{{ exporting ? '…' : '⬇ PNG' }}</button>
+            <button class="shared-btn" :disabled="exporting" @click="download('svg')">{{ exporting ? '…' : '⬇ SVG' }}</button>
+          </div>
+
+          <button class="shared-make" @click="emit('close')">Make your own crest →</button>
         </div>
-
-        <button class="shared-make" @click="emit('close')">Make your own crest →</button>
       </template>
     </div>
   </div>
@@ -174,6 +176,21 @@ async function download(format) {
 .shared-stage {
   pointer-events: none;   /* read-only crest */
   filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.55));
+}
+
+/* Legible panel behind the name + actions, matching the logo pill */
+.shared-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  background: rgba(15, 15, 19, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .shared-name {
