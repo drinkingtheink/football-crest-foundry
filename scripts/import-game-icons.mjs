@@ -284,6 +284,28 @@ const MANIFEST = [
   { file: 'lorc/crystal-cluster.svg',        id: 'gi-crystal',        label: 'Crystal',        group: 'Fantasy' },
   { file: 'lorc/fairy-wand.svg',             id: 'gi-magic-wand',     label: 'Magic Wand',     group: 'Fantasy' },
   { file: 'delapouite/ogre.svg',             id: 'gi-ogre',           label: 'Ogre',           group: 'Fantasy' },
+
+  // ══ Batch 7 — Esoteric + Crosses (new groups) & variants for existing concepts ═
+  // Esoteric
+  { file: 'skoll/pentacle.svg',              id: 'gi-pentacle',        label: 'Pentacle',        group: 'Esoteric' },
+  { file: 'lorc/pentagram-rose.svg',         id: 'gi-pentagram-rose',  label: 'Pentagram Rose',  group: 'Esoteric' },
+  { file: 'delapouite/triquetra.svg',        id: 'gi-triquetra',       label: 'Triquetra',       group: 'Esoteric' },
+  { file: 'delapouite/yin-yang.svg',         id: 'gi-yin-yang',        label: 'Yin Yang',        group: 'Esoteric' },
+  { file: 'delapouite/all-seeing-eye.svg',   id: 'gi-all-seeing-eye',  label: 'All-Seeing Eye',  group: 'Esoteric' },
+  { file: 'delapouite/eye-of-horus.svg',     id: 'gi-eye-of-horus',    label: 'Eye of Horus',    group: 'Esoteric' },
+  { file: 'lorc/sun-radiations.svg',         id: 'gi-sun-radiations',  label: 'Radiant Sun',     group: 'Esoteric' },
+  { file: 'lorc/evil-moon.svg',              id: 'gi-evil-moon',       label: 'Crescent Moon',   group: 'Esoteric' },
+  // Crosses (new group)
+  { file: 'lorc/gothic-cross.svg',           id: 'gi-gothic-cross',    label: 'Gothic Cross',    group: 'Crosses' },
+  { file: 'delapouite/jerusalem-cross.svg',  id: 'gi-jerusalem-cross', label: 'Jerusalem Cross', group: 'Crosses' },
+  { file: 'delapouite/camargue-cross.svg',   id: 'gi-camargue-cross',  label: 'Camargue Cross',  group: 'Crosses' },
+  { file: 'lorc/cross-flare.svg',            id: 'gi-cross-flare',     label: 'Flared Cross',    group: 'Crosses' },
+  // Variants for existing concepts
+  { file: 'delapouite/imperial-crown.svg',   id: 'gi-imperial-crown',  label: 'Imperial Crown',  group: 'Crowns' },
+  { file: 'delapouite/jewel-crown.svg',      id: 'gi-jewel-crown',     label: 'Jewel Crown',     group: 'Crowns' },
+  { file: 'delapouite/polar-star.svg',       id: 'gi-polar-star',      label: 'Polar Star',      group: 'Celestial' },
+  { file: 'delapouite/seven-pointed-star.svg', id: 'gi-seven-star',    label: 'Seven-Point Star',group: 'Celestial' },
+  { file: 'delapouite/striped-sun.svg',      id: 'gi-striped-sun',     label: 'Striped Sun',     group: 'Celestial' },
 ]
 
 function ensureRepo() {
