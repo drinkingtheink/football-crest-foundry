@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import BadgeComposer from './BadgeComposer.vue'
 import AppBackground from './AppBackground.vue'
 import BackgroundPicker from './BackgroundPicker.vue'
@@ -20,6 +20,28 @@ const emit = defineEmits(['remix', 'close', 'step-bg', 'set-bg', 'set-tone'])
 
 const composerRef = ref(null)
 const exporting = ref(false)
+
+// Pointer-driven 3D tilt + float, mirroring the editor's crest stage.
+const tiltRef = ref(null)
+const tilt = reactive({ rx: 0, ry: 0 })
+const crestHovered = ref(false)
+const reduceMotion = typeof window !== 'undefined'
+  && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+function onCrestMove(e) {
+  if (reduceMotion || !tiltRef.value) return
+  const r = tiltRef.value.getBoundingClientRect()
+  const px = (e.clientX - r.left) / r.width
+  const py = (e.clientY - r.top) / r.height
+  const MAX = 7 // degrees
+  tilt.ry = (px - 0.5) * 2 * MAX
+  tilt.rx = -(py - 0.5) * 2 * MAX
+}
+function onCrestLeave() {
+  crestHovered.value = false
+  tilt.rx = 0
+  tilt.ry = 0
+}
 
 async function download(format) {
   const svgEl = composerRef.value?.svgRootEl
@@ -62,8 +84,19 @@ async function download(format) {
       </div>
 
       <template v-else>
-        <div class="shared-stage">
-          <BadgeComposer ref="composerRef" :config="config" :size="420" uid="shared" />
+        <div class="shared-float" :class="{ hovered: crestHovered }">
+          <div
+            ref="tiltRef"
+            class="shared-tilt"
+            :style="{ transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)` }"
+            @mousemove="onCrestMove"
+            @mouseenter="crestHovered = true"
+            @mouseleave="onCrestLeave"
+          >
+            <div class="shared-stage">
+              <BadgeComposer ref="composerRef" :config="config" :size="420" uid="shared" />
+            </div>
+          </div>
         </div>
 
         <div class="shared-panel">
@@ -186,9 +219,33 @@ async function download(format) {
   padding: 80px 20px 40px;
 }
 
+/* Float + pointer-tilt, mirroring the editor's crest stage */
+@keyframes shared-float {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-5px); }
+}
+.shared-float {
+  position: relative;
+  perspective: 1100px;
+  animation: shared-float 3.4s ease-in-out infinite alternate;
+}
+.shared-float.hovered { animation-play-state: paused; }
+
+.shared-tilt {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+}
+
 .shared-stage {
-  pointer-events: none;   /* read-only crest */
+  pointer-events: none;   /* read-only crest; tilt hover is handled by .shared-tilt */
   filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.55));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shared-float { animation: none; }
+  .shared-tilt { transition: none; }
 }
 
 /* Background picker pill, matching the other floating panels */
