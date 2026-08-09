@@ -288,6 +288,25 @@ function centerOnShield() {
   for (const b of boxes) moveBox(b, b.ax + dx, b.ay + dy)
 }
 
+// Snap each element (individually) onto one of the shield's middle axes: the
+// vertical spine (x → cx) or the horizontal axis (y → cy). Unlike centerOnShield
+// this keeps the other coordinate, so a vertical stack lines up on the spine
+// without collapsing onto a single point.
+function centerOnShieldAxis(axis) {
+  const boxes = selectionBoxes()
+  if (!boxes.length) return
+  const { cx, cy } = shieldCenter()
+  for (const b of boxes) {
+    if (axis === 'v') moveBox(b, b.ax + (cx - b.cx), b.ay)
+    else              moveBox(b, b.ax, b.ay + (cy - b.cy))
+  }
+}
+
+const shieldAxisOps = [
+  { axis: 'v', title: 'Center on shield’s vertical axis' },
+  { axis: 'h', title: 'Center on shield’s horizontal axis' },
+]
+
 // Distribute even GAPS between elements along an axis (accounts for differing
 // sizes). Endpoints hold; the middle elements are respaced so the empty space
 // between adjacent edges is equal.
@@ -323,8 +342,15 @@ const ALIGN_ICONS = {
 }
 function alignIcon(edge) { return `<svg viewBox="0 0 16 16" width="15" height="15">${ALIGN_ICONS[edge]}</svg>` }
 
-const SHIELD_CENTER_ICON = '<path d="M8 1.6 3.2 3.3V7.8c0 3 2.4 4.9 4.8 6 2.4-1.1 4.8-3 4.8-6V3.3z" fill="none" stroke="#e8c84a" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="7.1" r="1.7" fill="currentColor"/>'
+const SHIELD_OUTLINE = '<path d="M8 1.6 3.2 3.3V7.8c0 3 2.4 4.9 4.8 6 2.4-1.1 4.8-3 4.8-6V3.3z" fill="none" stroke="#e8c84a" stroke-width="1.3" stroke-linejoin="round"/>'
+const SHIELD_CENTER_ICON = SHIELD_OUTLINE + '<circle cx="8" cy="7.1" r="1.7" fill="currentColor"/>'
 function shieldCenterIcon() { return `<svg viewBox="0 0 16 16" width="15" height="15">${SHIELD_CENTER_ICON}</svg>` }
+
+const SHIELD_AXIS_ICONS = {
+  v: SHIELD_OUTLINE + '<line x1="8" y1="2.2" x2="8" y2="12.6" stroke="currentColor" stroke-width="1.2" stroke-dasharray="1.5 1.3"/>',
+  h: SHIELD_OUTLINE + '<line x1="3" y1="7.2" x2="13" y2="7.2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="1.5 1.3"/>',
+}
+function shieldAxisIcon(axis) { return `<svg viewBox="0 0 16 16" width="15" height="15">${SHIELD_AXIS_ICONS[axis]}</svg>` }
 
 const distributeOps = [
   { axis: 'h', title: 'Distribute horizontal spacing' },
@@ -1070,6 +1096,15 @@ function stepBg(dir) {
               aria-label="Center on shield"
               @click="centerOnShield"
               v-html="shieldCenterIcon()"
+            />
+            <button
+              v-for="op in shieldAxisOps"
+              :key="op.axis"
+              class="align-btn"
+              :data-tip="op.title"
+              :aria-label="op.title"
+              @click="centerOnShieldAxis(op.axis)"
+              v-html="shieldAxisIcon(op.axis)"
             />
             <template v-if="alignableCount >= 2">
               <span class="align-sep" />
