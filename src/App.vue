@@ -852,7 +852,19 @@ function stepBg(dir) {
           </div>
         </Transition>
 
-        <!-- Align toolbar — shield-center at 1+ elements; align at 2+; distribute at 3+ -->
+        <button
+          class="bg-arrow bg-arrow-left"
+          :title="`← ${bgOptions[(bgOptions.findIndex(o => o.id === appBg) - 1 + bgOptions.length) % bgOptions.length].label}`"
+          @click="stepBg(-1)"
+        >‹</button>
+        <button
+          class="bg-arrow bg-arrow-right"
+          :title="`${bgOptions[(bgOptions.findIndex(o => o.id === appBg) + 1) % bgOptions.length].label} →`"
+          @click="stepBg(1)"
+        >›</button>
+
+        <div class="badge-float-wrap" :class="{ active: isBadgeActive }">
+        <!-- Align toolbar — anchored just above the crest. Shield-center at 1+; align at 2+; distribute at 3+ -->
         <Transition name="align-fade">
           <div v-if="alignableCount >= 1" class="align-bar">
             <button
@@ -885,19 +897,6 @@ function stepBg(dir) {
             </template>
           </div>
         </Transition>
-
-        <button
-          class="bg-arrow bg-arrow-left"
-          :title="`← ${bgOptions[(bgOptions.findIndex(o => o.id === appBg) - 1 + bgOptions.length) % bgOptions.length].label}`"
-          @click="stepBg(-1)"
-        >‹</button>
-        <button
-          class="bg-arrow bg-arrow-right"
-          :title="`${bgOptions[(bgOptions.findIndex(o => o.id === appBg) + 1) % bgOptions.length].label} →`"
-          @click="stepBg(1)"
-        >›</button>
-
-        <div class="badge-float-wrap" :class="{ active: isBadgeActive }">
         <div
           ref="badgeTiltRef"
           class="badge-tilt"
@@ -1651,7 +1650,7 @@ function stepBg(dir) {
 
 .align-bar {
   position: absolute;
-  top: 14px;
+  bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 6;
