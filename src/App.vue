@@ -727,8 +727,16 @@ function randomizeColors() {
   activeClub.value = club
 }
 
+// A loaded config references fonts that may not be fetched yet — load them so
+// text renders in its real face, not a wider system fallback.
+function loadConfigFonts(cfg) {
+  const families = [...new Set((cfg?.texts ?? []).map(t => t.fontFamily).filter(Boolean))]
+  families.forEach(loadFont)
+}
+
 function onLoadSnapshot(cfg) {
   loadConfig(cfg)
+  loadConfigFonts(cfg)
   isCurated.value = false // a loaded snapshot isn't the library's curated crest
 }
 
@@ -745,6 +753,7 @@ function randomizeAll() {
     const pick = crestLibrary[Math.floor(Math.random() * crestLibrary.length)]
     curatedLoadPending = true
     loadConfig(pick.config)   // clears selection; missing icons swapped in loadConfig
+    loadConfigFonts(pick.config)
     isCurated.value = true
     activeClub.value = null
     return
