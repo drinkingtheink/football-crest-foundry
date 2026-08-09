@@ -63,9 +63,6 @@ function saveCopy() {
               <button type="submit" class="save-confirm" :class="{ forging: saving }" :disabled="saving || !name.trim()">
                 <svg class="save-bolt" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z" fill="currentColor"/></svg>
                 <span>{{ saving ? 'Forging…' : (activeName ? 'Update' : 'Save') }}</span>
-                <span class="forge-embers" aria-hidden="true">
-                  <i class="fember f1" /><i class="fember f2" /><i class="fember f3" /><i class="fember f4" /><i class="fember f5" /><i class="fember f6" />
-                </span>
               </button>
             </div>
           </form>
@@ -282,43 +279,7 @@ function saveCopy() {
 
 .save-bolt { filter: drop-shadow(0 0 3px rgba(255, 150, 40, 0.6)); }
 
-/* Sparks spat off the top of the button — gentle at rest, a bright spray while forging */
-.forge-embers {
-  position: absolute;
-  left: 12%;
-  right: 12%;
-  top: 2px;
-  height: 1px;
-  pointer-events: none;
-}
-.forge-embers .fember {
-  position: absolute;
-  top: 0;
-  width: 2.5px;
-  height: 2.5px;
-  border-radius: 50%;
-  background: #fff1c6;
-  box-shadow: 0 0 6px 1px rgba(255, 150, 40, 0.9);
-  opacity: 0;
-  animation: forge-spit 2.4s ease-out infinite;
-}
-.forge-embers .f1 { left: 8%;  --fx: -5px; animation-duration: 2.3s; animation-delay: -0.2s; }
-.forge-embers .f2 { left: 24%; --fx: 4px;  animation-duration: 2.7s; animation-delay: -1.1s; }
-.forge-embers .f3 { left: 42%; --fx: -3px; animation-duration: 2.1s; animation-delay: -1.7s; }
-.forge-embers .f4 { left: 58%; --fx: 6px;  animation-duration: 2.9s; animation-delay: -0.6s; }
-.forge-embers .f5 { left: 74%; --fx: -4px; animation-duration: 2.4s; animation-delay: -2.0s; }
-.forge-embers .f6 { left: 90%; --fx: 3px;  animation-duration: 2.6s; animation-delay: -1.4s; }
-@keyframes forge-spit {
-  0%   { transform: translate(0, 0) scale(0.6);       opacity: 0; }
-  12%  { opacity: 0.9; }
-  100% { transform: translate(var(--fx), -16px) scale(0.2); opacity: 0; }
-}
-/* actively forging: a faster, whiter shower */
-.save-confirm.forging .fember {
-  animation-duration: 0.85s;
-  background: #ffffff;
-  box-shadow: 0 0 7px 1.5px rgba(255, 180, 70, 1);
-}
+/* actively forging: the button intensifies its glow */
 .save-confirm.forging { box-shadow: 0 0 22px rgba(255, 176, 66, 0.6); }
 
 .save-terms {
@@ -334,7 +295,7 @@ function saveCopy() {
 .save-terms a:hover { color: var(--accent-warm); }
 
 @media (prefers-reduced-motion: reduce) {
-  .top-embers, .forge-embers { display: none; }
+  .top-embers { display: none; }
 }
 
 .save-fade-enter-active,
