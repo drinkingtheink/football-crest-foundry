@@ -7351,6 +7351,16 @@ export const icons = [
       'M256 32a224 224 0 0 0-161.393 69.035h323.045A224 224 0 0 0 256 32zM79.148 118.965a224 224 0 0 0-16.976 25.16H449.74a224 224 0 0 0-16.699-25.16H79.148zm-27.222 45.16A224 224 0 0 0 43.3 186.25h425.271a224 224 0 0 0-8.586-22.125H51.926zM36.783 210.25a224 224 0 0 0-3.02 19.125h444.368a224 224 0 0 0-3.113-19.125H36.783zm-4.752 45.125A224 224 0 0 0 32 256a224 224 0 0 0 .64 16.5h446.534A224 224 0 0 0 480 256a224 224 0 0 0-.021-.625H32.03zm4.67 45.125a224 224 0 0 0 3.395 15.125h431.578a224 224 0 0 0 3.861-15.125H36.701zm14.307 45.125a224 224 0 0 0 6.017 13.125H454.82a224 224 0 0 0 6.342-13.125H51.008zm26.316 45.125a224 224 0 0 0 9.04 11.125H425.86a224 224 0 0 0 8.727-11.125H77.324zm45.62 45.125A224 224 0 0 0 136.247 445h239.89a224 224 0 0 0 12.936-9.125h-266.13z',
     ],
   },
+
+  // ── Heraldic ordinaries (hand-authored geometric charges, viewBox 100×100) ──
+  { id: 'ord-pale',    label: 'Pale',    group: 'Heraldic', paths: ['M38,8 L62,8 L62,92 L38,92 Z'] },
+  { id: 'ord-fess',    label: 'Fess',    group: 'Heraldic', paths: ['M8,38 L92,38 L92,62 L8,62 Z'] },
+  { id: 'ord-bend',    label: 'Bend',    group: 'Heraldic', paths: ['M8,8 L30,8 L92,70 L92,92 L70,92 L8,30 Z'] },
+  { id: 'ord-saltire', label: 'Saltire', group: 'Heraldic', paths: ['M8,8 L26,8 L92,74 L92,92 L74,92 L8,26 Z', 'M74,8 L92,8 L92,26 L26,92 L8,92 L8,74 Z'] },
+  { id: 'ord-pile',    label: 'Pile',    group: 'Heraldic', paths: ['M8,10 L92,10 L50,90 Z'] },
+  { id: 'ord-chief',   label: 'Chief',   group: 'Heraldic', paths: ['M8,8 L92,8 L92,30 L8,30 Z'] },
+  { id: 'ord-roundel', label: 'Roundel', group: 'Heraldic', paths: ['M12,50 A38,38 0 1 0 88,50 A38,38 0 1 0 12,50 Z'] },
+  { id: 'ord-lozenge', label: 'Lozenge', group: 'Heraldic', paths: ['M50,8 L88,50 L50,92 L12,50 Z'] },
 ]
 
 export const iconsById = Object.fromEntries(icons.map(ic => [ic.id, ic]))
