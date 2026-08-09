@@ -7361,6 +7361,20 @@ export const icons = [
   { id: 'ord-chief',   label: 'Chief',   group: 'Heraldic', paths: ['M8,8 L92,8 L92,30 L8,30 Z'] },
   { id: 'ord-roundel', label: 'Roundel', group: 'Heraldic', paths: ['M12,50 A38,38 0 1 0 88,50 A38,38 0 1 0 12,50 Z'] },
   { id: 'ord-lozenge', label: 'Lozenge', group: 'Heraldic', paths: ['M50,8 L88,50 L50,92 L12,50 Z'] },
+  // ── Named crosses + alchemical glyphs (hand-authored, viewBox 100×100) ──
+  { id: 'cr-maltese', label: 'Maltese Cross', group: 'Crosses', paths: ['M44,50 L30,10 L50,26 L70,10 L56,50 Z', 'M44,50 L30,90 L50,74 L70,90 L56,50 Z', 'M50,44 L10,30 L26,50 L10,70 L50,56 Z', 'M50,44 L90,30 L74,50 L90,70 L50,56 Z'] },
+  { id: 'cr-pattee', label: 'Cross Pattée', group: 'Crosses', paths: ['M42,50 L28,12 L72,12 L58,50 Z', 'M42,50 L28,88 L72,88 L58,50 Z', 'M50,42 L12,28 L12,72 L50,58 Z', 'M50,42 L88,28 L88,72 L50,58 Z'] },
+  { id: 'cr-bottony', label: 'Cross Bottony', group: 'Crosses', paths: ['M42,18 L58,18 L58,42 L82,42 L82,58 L58,58 L58,82 L42,82 L42,58 L18,58 L18,42 L42,42 Z', 'M42,14 A8,8 0 1 0 58,14 A8,8 0 1 0 42,14 Z', 'M35,20 A6,6 0 1 0 47,20 A6,6 0 1 0 35,20 Z', 'M53,20 A6,6 0 1 0 65,20 A6,6 0 1 0 53,20 Z', 'M42,86 A8,8 0 1 0 58,86 A8,8 0 1 0 42,86 Z', 'M35,80 A6,6 0 1 0 47,80 A6,6 0 1 0 35,80 Z', 'M53,80 A6,6 0 1 0 65,80 A6,6 0 1 0 53,80 Z', 'M6,50 A8,8 0 1 0 22,50 A8,8 0 1 0 6,50 Z', 'M14,41 A6,6 0 1 0 26,41 A6,6 0 1 0 14,41 Z', 'M14,59 A6,6 0 1 0 26,59 A6,6 0 1 0 14,59 Z', 'M78,50 A8,8 0 1 0 94,50 A8,8 0 1 0 78,50 Z', 'M74,41 A6,6 0 1 0 86,41 A6,6 0 1 0 74,41 Z', 'M74,59 A6,6 0 1 0 86,59 A6,6 0 1 0 74,59 Z'] },
+  { id: 'cr-crosslet', label: 'Cross Crosslet', group: 'Crosses', paths: ['M42,18 L58,18 L58,42 L82,42 L82,58 L58,58 L58,82 L42,82 L42,58 L18,58 L18,42 L42,42 Z', 'M33,18 L67,18 L67,30 L33,30 Z', 'M33,70 L67,70 L67,82 L33,82 Z', 'M18,33 L30,33 L30,67 L18,67 Z', 'M70,33 L82,33 L82,67 L70,67 Z'] },
+  { id: 'cr-potent', label: 'Cross Potent', group: 'Crosses', paths: ['M42,18 L58,18 L58,42 L82,42 L82,58 L58,58 L58,82 L42,82 L42,58 L18,58 L18,42 L42,42 Z', 'M30,9 L70,9 L70,21 L30,21 Z', 'M30,79 L70,79 L70,91 L30,91 Z', 'M9,30 L21,30 L21,70 L9,70 Z', 'M79,30 L91,30 L91,70 L79,70 Z'] },
+  { id: 'cr-moline', label: 'Cross Moline', group: 'Crosses', paths: ['M42,18 L58,18 L58,42 L82,42 L82,58 L58,58 L58,82 L42,82 L42,58 L18,58 L18,42 L42,42 Z', 'M42,31 L29,11 L45,25 L50,19 L55,25 L71,11 L58,31 Z', 'M69 42L89 29 75 45 81 50 75 55 89 71 69 58Z', 'M58 69L71 89 55 75 50 81 45 75 29 89 42 69Z', 'M31 58L11 71 25 55 19 50 25 45 11 29 31 42Z'] },
+  { id: 'cr-fleury', label: 'Cross Fleury', group: 'Crosses', paths: ['M42,18 L58,18 L58,42 L82,42 L82,58 L58,58 L58,82 L42,82 L42,58 L18,58 L18,42 L42,42 Z', 'M44,32 Q34,32 34,21 Q34,12 45,15 L45,7 L50,1 L55,7 L55,15 Q66,12 66,21 Q66,32 56,32 Z', 'M68 44Q68 34 79 34 88 34 85 45L93 45 99 50 93 55 85 55Q88 66 79 66 68 66 68 56Z', 'M56 68Q66 68 66 79 66 88 55 85L55 93 50 99 45 93 45 85Q34 88 34 79 34 68 44 68Z', 'M32 56Q32 66 21 66 12 66 15 55L7 55 1 50 7 45 15 45Q12 34 21 34 32 34 32 44Z'] },
+  { id: 'al-fire', label: 'Fire', group: 'Alchemy', paths: ['M50,14 L86,82 L14,82 Z'] },
+  { id: 'al-water', label: 'Water', group: 'Alchemy', paths: ['M14,18 L86,18 L50,86 Z'] },
+  { id: 'al-air', label: 'Air', group: 'Alchemy', paths: ['M50,14 L69,50 L31,50 Z', 'M27,58 L73,58 L86,82 L14,82 Z'] },
+  { id: 'al-earth', label: 'Earth', group: 'Alchemy', paths: ['M14,18 L86,18 L69,50 L31,50 Z', 'M35,58 L65,58 L50,86 Z'] },
+  { id: 'al-sulfur', label: 'Sulfur', group: 'Alchemy', paths: ['M50,8 L74,50 L26,50 Z', 'M43,42 L57,42 L57,82 L43,82 Z', 'M33,71 L67,71 L67,85 L33,85 Z'] },
+  { id: 'al-salt', label: 'Salt', group: 'Alchemy', paths: ['M16.24,46 A34,34 0 0 1 83.76,46 Z', 'M16.24,54 A34,34 0 0 0 83.76,54 Z'] },
 ]
 
 export const iconsById = Object.fromEntries(icons.map(ic => [ic.id, ic]))
