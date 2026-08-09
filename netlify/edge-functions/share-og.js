@@ -15,6 +15,7 @@ export default async (request, context) => {
     const headers = new Headers(response.headers)
     headers.set('x-share-og', status)
     headers.set('cache-control', 'no-store')
+    headers.set('netlify-cdn-cache-control', 'no-store')
     return new Response(response.body, { status: response.status, headers })
   }
 
@@ -70,12 +71,15 @@ export default async (request, context) => {
   ].join('\n    ')
 
   const html = await response.text()
-  const replaced = html.replace(/<!-- SHARE-META:START -->[\s\S]*?<!-- SHARE-META:END -->/, meta)
+  // Start marker carries trailing descriptive text in index.html, so match
+  // from `SHARE-META:START` (any content) through the END marker.
+  const replaced = html.replace(/<!-- SHARE-META:START[\s\S]*?<!-- SHARE-META:END -->/, meta)
 
   const headers = new Headers(response.headers)
   headers.delete('content-length')
   headers.set('x-share-og', 'injected')
   headers.set('cache-control', 'no-store')
+  headers.set('netlify-cdn-cache-control', 'no-store')
   return new Response(replaced, { status: response.status, headers })
 }
 
