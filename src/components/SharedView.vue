@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import BadgeComposer from './BadgeComposer.vue'
+import AppBackground from './AppBackground.vue'
+import LogoMark from './LogoMark.vue'
 import { exportCrestPng, exportCrestSvg, crestFilename } from '../utils/exportBadge.js'
 
 const props = defineProps({
@@ -8,6 +10,9 @@ const props = defineProps({
   name: { type: String, default: '' },
   loading: Boolean,
   error: Boolean,
+  bgType: { type: String, default: 'none' },
+  tone: { type: String, default: 'dark' },
+  overlay: { type: Object, default: null },   // { color, opacity } for image backgrounds
 })
 const emit = defineEmits(['remix', 'close'])
 
@@ -31,31 +36,42 @@ async function download(format) {
 
 <template>
   <div class="shared-view">
-    <div v-if="loading" class="shared-state">Loading crest…</div>
+    <AppBackground :type="bgType" :tone="tone" />
+    <div v-if="overlay" class="shared-overlay" :style="{ background: overlay.color, opacity: overlay.opacity }" />
 
-    <div v-else-if="error || !config" class="shared-state">
-      <h1 class="shared-oops">Crest not found</h1>
-      <p>This link is invalid, or the crest is no longer shared.</p>
-      <button class="shared-primary" @click="emit('close')">Make your own crest →</button>
+    <div class="shared-logo">
+      <LogoMark class="shared-logo-mark" />
+      <div class="shared-logo-text">
+        <p class="shared-logo-name">Crest Foundry</p>
+        <p class="shared-logo-tag">Forge Your Club's Legacy</p>
+      </div>
     </div>
 
-    <template v-else>
-      <div class="shared-brand">⚒ Crest Foundry</div>
+    <div class="shared-inner">
+      <div v-if="loading" class="shared-state">Loading crest…</div>
 
-      <div class="shared-stage">
-        <BadgeComposer ref="composerRef" :config="config" :size="420" uid="shared" />
+      <div v-else-if="error || !config" class="shared-state">
+        <h1 class="shared-oops">Crest not found</h1>
+        <p>This link is invalid, or the crest is no longer shared.</p>
+        <button class="shared-primary" @click="emit('close')">Make your own crest →</button>
       </div>
 
-      <h1 v-if="name" class="shared-name">{{ name }}</h1>
+      <template v-else>
+        <div class="shared-stage">
+          <BadgeComposer ref="composerRef" :config="config" :size="420" uid="shared" />
+        </div>
 
-      <div class="shared-actions">
-        <button class="shared-primary" @click="emit('remix')">Remix this crest</button>
-        <button class="shared-btn" :disabled="exporting" @click="download('png')">{{ exporting ? '…' : '⬇ PNG' }}</button>
-        <button class="shared-btn" :disabled="exporting" @click="download('svg')">{{ exporting ? '…' : '⬇ SVG' }}</button>
-      </div>
+        <h1 v-if="name" class="shared-name">{{ name }}</h1>
 
-      <button class="shared-make" @click="emit('close')">Make your own crest →</button>
-    </template>
+        <div class="shared-actions">
+          <button class="shared-primary" @click="emit('remix')">Remix this crest</button>
+          <button class="shared-btn" :disabled="exporting" @click="download('png')">{{ exporting ? '…' : '⬇ PNG' }}</button>
+          <button class="shared-btn" :disabled="exporting" @click="download('svg')">{{ exporting ? '…' : '⬇ SVG' }}</button>
+        </div>
+
+        <button class="shared-make" @click="emit('close')">Make your own crest →</button>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -64,29 +80,63 @@ async function download(format) {
   position: fixed;
   inset: 0;
   z-index: 200;
+  overflow-y: auto;
+  background: #0f0f13;
+}
+
+/* image-background tint, mirroring the editor's app-overlay */
+.shared-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.shared-logo {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.shared-logo-mark { flex: none; }
+.shared-logo-text { display: flex; flex-direction: column; gap: 1px; }
+.shared-logo-name {
+  margin: 0;
+  font-family: 'Yeseva One', Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  line-height: 1.05;
+  color: #e8c84a;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.shared-logo-tag {
+  margin: 0;
+  font-size: 10px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: #b9b6b6;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.shared-inner {
+  position: relative;
+  z-index: 2;
+  min-height: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 18px;
-  padding: 32px 20px;
-  background: #0f0f13;
-  overflow-y: auto;
-}
-
-.shared-brand {
-  position: absolute;
-  top: 22px;
-  left: 24px;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #e8c84a;
+  padding: 80px 20px 40px;
 }
 
 .shared-stage {
-  /* read-only: no dragging/selecting the shared crest */
-  pointer-events: none;
+  pointer-events: none;   /* read-only crest */
   filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.55));
 }
 
@@ -94,8 +144,9 @@ async function download(format) {
   margin: 0;
   font-size: 22px;
   font-weight: 700;
-  color: #e8e8ec;
+  color: #f2f2f4;
   text-align: center;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
 }
 
 .shared-actions {
@@ -119,7 +170,7 @@ async function download(format) {
 .shared-primary:hover { box-shadow: 0 0 18px rgba(232, 200, 74, 0.5); filter: brightness(1.05); }
 
 .shared-btn {
-  background: #1e1e28;
+  background: rgba(30, 30, 40, 0.85);
   border: 1px solid #3a3a4a;
   border-radius: 8px;
   color: #cfcfd6;
@@ -134,10 +185,11 @@ async function download(format) {
 .shared-make {
   background: none;
   border: none;
-  color: #888;
+  color: #cfcfd6;
   font-size: 13px;
   padding: 4px;
   cursor: pointer;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
   transition: color 0.15s;
 }
 .shared-make:hover { color: var(--accent-warm); text-decoration: underline; }
@@ -147,9 +199,10 @@ async function download(format) {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  color: #b9b6b6;
+  color: #d6d4da;
   font-size: 14px;
   text-align: center;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
 }
-.shared-oops { margin: 0; font-size: 22px; color: #e8e8ec; }
+.shared-oops { margin: 0; font-size: 22px; color: #f2f2f4; }
 </style>

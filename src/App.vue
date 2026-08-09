@@ -1002,6 +1002,9 @@ function stepBg(dir) {
       :name="sharedName"
       :loading="sharedLoading"
       :error="sharedError"
+      :bg-type="appBg"
+      :tone="patternTone"
+      :overlay="imageBgTypes.has(appBg) ? overlay : null"
       @remix="onRemixShared"
       @close="onCloseShared"
     />
@@ -1959,7 +1962,7 @@ function stepBg(dir) {
 
 .align-bar {
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 52px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 6;
