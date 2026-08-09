@@ -1055,6 +1055,7 @@ function stepBg(dir) {
         </span>
       </span>
       <p class="logo mobile-gate-wordmark"><span class="logo-title">Crest Foundry<i class="logo-ember e1" /><i class="logo-ember e2" /><i class="logo-ember e3" /><i class="logo-ember e4" /><i class="logo-ember e5" /></span></p>
+      <p class="logo-byline mobile-gate-byline">Forge Your Club's Legacy</p>
       <p class="mobile-gate-msg">The Foundry works best on tablet and up — Thx</p>
     </div>
     <AppBackground :type="appBg" :tone="patternTone" />
@@ -1795,12 +1796,18 @@ function stepBg(dir) {
     line-height: 1;
     text-align: center;
   }
+  .mobile-gate-byline {
+    margin-top: -26px;
+    font-size: clamp(12px, 3.4vw, 15px);
+    text-align: center;
+  }
   .mobile-gate-msg {
     margin: 0;
     max-width: 22ch;
     color: #e8e8ec;
-    font-size: 1.05rem;
-    line-height: 1.5;
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 1.35rem;
+    line-height: 1.45;
     letter-spacing: 0.01em;
   }
 }
