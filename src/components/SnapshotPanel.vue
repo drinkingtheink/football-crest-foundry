@@ -1,7 +1,8 @@
 <script setup>
-import { ref, watch, nextTick, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { listSnapshots, deleteSnapshot } from '../utils/snapshots.js'
 import { useToast } from '../composables/useToast.js'
+import SaveModal from './SaveModal.vue'
 
 const props = defineProps({ saveFn: { type: Function, required: true } })
 const emit = defineEmits(['load'])
@@ -19,9 +20,8 @@ async function copyConfig(snap) {
 
 const snapshots = ref([])
 const saving = ref(false)
-const showNameInput = ref(false)
-const nameInput = ref('')
-const nameFieldRef = ref(null)
+const showSaveModal = ref(false)
+const defaultName = ref('')
 
 const loading = ref(false)
 async function refresh() {
@@ -37,33 +37,21 @@ async function refresh() {
 defineExpose({ refresh, startSave })
 onMounted(refresh)
 
-watch(showNameInput, async (v) => {
-  if (v) { await nextTick(); nameFieldRef.value?.focus() }
-})
-
 function startSave() {
-  nameInput.value = `Design ${new Date().toLocaleDateString()}`
-  showNameInput.value = true
+  defaultName.value = `Design ${new Date().toLocaleDateString()}`
+  showSaveModal.value = true
 }
 
-async function confirmSave() {
-  const name = nameInput.value.trim()
-  if (!name) return
+async function confirmSave(name) {
   saving.value = true
   try {
     const saved = await props.saveFn(name)
     if (saved === false) return   // save failed (e.g. storage full); keep the dialog open
     refresh()
-    showNameInput.value = false
-    nameInput.value = ''
+    showSaveModal.value = false
   } finally {
     saving.value = false
   }
-}
-
-function cancelSave() {
-  showNameInput.value = false
-  nameInput.value = ''
 }
 
 function handleLoad(snap) { emit('load', snap.config) }
@@ -87,22 +75,16 @@ function formatDate(ts) {
 <template>
   <div class="snapshot-panel">
     <div class="snap-header">
-      <button v-if="!showNameInput" class="snap-save-btn" @click="startSave">+ Save Snapshot</button>
-      <div v-else class="snap-name-form">
-        <input
-          ref="nameFieldRef"
-          v-model="nameInput"
-          class="snap-name-input"
-          placeholder="Snapshot name"
-          @keydown.enter="confirmSave"
-          @keydown.escape="cancelSave"
-        />
-        <button class="snap-confirm-btn" :disabled="saving" @click="confirmSave">
-          {{ saving ? '…' : 'Save' }}
-        </button>
-        <button class="snap-cancel-btn" @click="cancelSave">✕</button>
-      </div>
+      <button class="snap-save-btn" @click="startSave">+ Save Snapshot</button>
     </div>
+
+    <SaveModal
+      :open="showSaveModal"
+      :saving="saving"
+      :default-name="defaultName"
+      @save="confirmSave"
+      @close="showSaveModal = false"
+    />
 
     <p v-if="loading && !snapshots.length" class="snap-empty">Loading…</p>
     <p v-else-if="!snapshots.length" class="snap-empty">No snapshots saved yet.<br>Save a snapshot to revisit this design later.</p>
@@ -142,53 +124,6 @@ function formatDate(ts) {
   transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
 .snap-save-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); box-shadow: 0 0 10px var(--accent-warm-glow); }
-
-.snap-name-form {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-}
-
-.snap-name-input {
-  flex: 1;
-  min-width: 0;
-  background: #1e1e28;
-  border: 1px solid #3a3a4a;
-  border-radius: 5px;
-  color: #e8e8ec;
-  font-size: 12px;
-  padding: 6px 8px;
-  outline: none;
-}
-.snap-name-input:focus { border-color: var(--accent-warm); }
-
-.snap-confirm-btn {
-  background: #e8c84a;
-  border: none;
-  border-radius: 5px;
-  color: #111;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 10px;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.snap-confirm-btn:disabled { opacity: 0.55; cursor: default; }
-
-.snap-cancel-btn {
-  background: none;
-  border: 1px solid #3a3a4a;
-  border-radius: 5px;
-  color: #888;
-  font-size: 13px;
-  padding: 5px 7px;
-  cursor: pointer;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: color 0.12s, border-color 0.12s;
-}
-.snap-cancel-btn:hover { color: #e05555; border-color: #e05555; }
 
 .snap-empty {
   font-size: 11px;
