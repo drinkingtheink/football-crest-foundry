@@ -51,6 +51,12 @@ const DEFAULT_TEXT = () => ({
   y: 120,
 })
 
+// The two texts a fresh crest ships with: club name up top, monogram in the belly.
+const DEFAULT_TEXTS = () => [
+  { ...DEFAULT_TEXT(), id: 'club-name', content: 'CREST FOUNDRY', fontSize: 13, fontWeight: 'bold', letterSpacing: 2, x: 100, y: 55 },
+  { ...DEFAULT_TEXT(), id: 'monogram', content: 'FC', fontSize: 22, fontWeight: 'bold', letterSpacing: 3, x: 100, y: 185 },
+]
+
 // ── Singleton state (module-level so any component gets the same instance) ──
 const config = reactive({
   shapeId: 'traditional-english',
@@ -72,28 +78,7 @@ const config = reactive({
     const size = 90 + Math.floor(Math.random() * 45) // 90–134, larger than a manual add
     return [{ instanceId: 'sym-init', iconId: _randomIcon.id, color: fill, x: 100, y: 120, size, strokeColor: _contrastColor(fill, palette), strokeWidth: 3 }]
   })(),
-  texts: [
-    {
-      ...DEFAULT_TEXT(),
-      id: 'club-name',
-      content: 'CREST FOUNDRY',
-      fontSize: 13,
-      fontWeight: 'bold',
-      letterSpacing: 2,
-      x: 100,
-      y: 55,
-    },
-    {
-      ...DEFAULT_TEXT(),
-      id: 'monogram',
-      content: 'FC',
-      fontSize: 22,
-      fontWeight: 'bold',
-      letterSpacing: 3,
-      x: 100,
-      y: 185,
-    },
-  ],
+  texts: DEFAULT_TEXTS(),
   border: _defaultBorder,
 })
 
@@ -269,6 +254,12 @@ export function useBadgeConfig() {
 
   function selectText(id) { setSelection('text', id) }
 
+  // Restore the default club-name + monogram when a crest has no text at all
+  // (e.g. the user deleted every text before re-forging).
+  function ensureDefaultTexts() {
+    if (config.texts.length === 0) config.texts.push(...DEFAULT_TEXTS())
+  }
+
   function pasteSymbol(source) {
     const instanceId = `sym-${nextId++}`
     config.symbols.push({ ...source, instanceId, x: source.x + 8, y: source.y + 8 })
@@ -294,10 +285,7 @@ export function useBadgeConfig() {
     config.palette.splice(0, config.palette.length, '#1a3a6b', '#c8102e', '#ffffff')
     Object.assign(config.background, { type: 'solid', stripeCount: 4, sashWidth: 174, sunburstRays: 12, gradient: ['#1a3a6b', '#c8102e'], gradientAngle: 45 })
     config.symbols.splice(0, config.symbols.length)
-    config.texts.splice(0, config.texts.length,
-      { ...DEFAULT_TEXT(), id: 'club-name', content: 'CREST FOUNDRY', fontSize: 13, fontWeight: 'bold', letterSpacing: 2, x: 100, y: 55 },
-      { ...DEFAULT_TEXT(), id: 'monogram', content: 'FC', fontSize: 22, fontWeight: 'bold', letterSpacing: 3, x: 100, y: 185 },
-    )
+    config.texts.splice(0, config.texts.length, ...DEFAULT_TEXTS())
     Object.assign(config.border, { color: '#ffffff', width: 0 })
     clearSelection()
   }
@@ -366,6 +354,7 @@ export function useBadgeConfig() {
     updateSymbolPosition,
     selectSymbol,
     addText,
+    ensureDefaultTexts,
     removeText,
     updateText,
     updateTextPosition,

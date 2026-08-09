@@ -56,6 +56,7 @@ const {
   updateSymbolPosition,
   selectSymbol,
   addText,
+  ensureDefaultTexts,
   removeText,
   updateText,
   updateTextPosition,
@@ -769,6 +770,10 @@ function randomizeAll() {
       strokeColor,
     })
   }
+
+  // If the user forged after deleting every text, bring the defaults back so the
+  // crest still gets its name + monogram styled below.
+  ensureDefaultTexts()
 
   const nameFont = randomFonts[Math.floor(Math.random() * randomFonts.length)].family
   const monogramFont = randomFonts[Math.floor(Math.random() * randomFonts.length)].family

@@ -147,7 +147,7 @@ const showRectTile = computed(() => {
 .group-tab.active { border-color: #e8c84a; color: #e8c84a; }
 
 .icon-grid-scroll {
-  max-height: 200px;
+  max-height: min(38vh, 360px);
   overflow-y: auto;
   /* Firefox */
   scrollbar-width: thin;
