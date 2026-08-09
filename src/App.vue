@@ -632,6 +632,10 @@ async function doRevokeShare() {
 
 // --- Shared view (opening a ?c=<token> link) ---
 const sharedActive  = ref(new URLSearchParams(location.search).has('c'))
+// The mobile shim is dismissable ONLY on a share link (so a recipient can view
+// the crest on their phone). Re-arms the moment we leave the shared view.
+const gateDismissed = ref(false)
+watch(sharedActive, (v) => { if (!v) gateDismissed.value = false })
 const sharedLoading = ref(sharedActive.value)
 const sharedError   = ref(false)
 const sharedConfig  = ref(null)
@@ -1047,16 +1051,17 @@ function stepBg(dir) {
 
 <template>
   <div class="app">
-    <div class="mobile-gate" aria-hidden="true">
-      <span class="mobile-gate-logo-wrap">
+    <div v-show="!(sharedActive && gateDismissed)" class="mobile-gate">
+      <span class="mobile-gate-logo-wrap" aria-hidden="true">
         <LogoMark class="mobile-gate-logo" />
         <span class="gate-embers" aria-hidden="true">
           <i class="gember g1" /><i class="gember g2" /><i class="gember g3" /><i class="gember g4" /><i class="gember g5" /><i class="gember g6" /><i class="gember g7" /><i class="gember g8" /><i class="gember g9" /><i class="gember g10" /><i class="gember g11" /><i class="gember g12" />
         </span>
       </span>
-      <p class="logo mobile-gate-wordmark"><span class="logo-title">Crest Foundry<i class="logo-ember e1" /><i class="logo-ember e2" /><i class="logo-ember e3" /><i class="logo-ember e4" /><i class="logo-ember e5" /></span></p>
+      <p class="logo mobile-gate-wordmark" aria-hidden="true"><span class="logo-title">Crest Foundry<i class="logo-ember e1" /><i class="logo-ember e2" /><i class="logo-ember e3" /><i class="logo-ember e4" /><i class="logo-ember e5" /></span></p>
       <p class="logo-byline mobile-gate-byline">Forge Your Club's Legacy</p>
-      <p class="mobile-gate-msg">The Foundry works best on tablet and up — Thx</p>
+      <p class="mobile-gate-msg">The Foundry works best on larger screens. For now. — Thx</p>
+      <button v-if="sharedActive" class="mobile-gate-dismiss" @click="gateDismissed = true">View shared crest anyway</button>
     </div>
     <AppBackground :type="appBg" :tone="patternTone" />
     <div
@@ -1809,6 +1814,23 @@ function stepBg(dir) {
     font-size: 1.35rem;
     line-height: 1.45;
     letter-spacing: 0.01em;
+  }
+  .mobile-gate-dismiss {
+    margin-top: 6px;
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid #e8c84a;
+    border-radius: 8px;
+    color: #e8c84a;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mobile-gate-dismiss:active {
+    background: #e8c84a;
+    color: #111;
   }
 }
 
