@@ -92,6 +92,20 @@ async function _doImport() {
   return { imported }
 }
 
+// Delete every cloud design belonging to the signed-in user. RLS already
+// scopes deletes to the owner; the explicit owner_id filter is belt-and-suspenders.
+export async function clearCloudDesigns() {
+  const uid = await currentUserId()
+  if (!uid) return { deleted: 0 }
+  const { data, error } = await supabase
+    .from('designs')
+    .delete()
+    .eq('owner_id', uid)
+    .select('id')
+  if (error) throw error
+  return { deleted: data?.length ?? 0 }
+}
+
 // --- Cloud (Supabase) ---
 
 async function saveCloud(uid, name, config, thumbnail) {

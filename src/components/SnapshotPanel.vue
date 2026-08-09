@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { listSnapshots, deleteSnapshot } from '../utils/snapshots.js'
+import { ref, computed, onMounted } from 'vue'
+import { listSnapshots, deleteSnapshot, clearCloudDesigns } from '../utils/snapshots.js'
 import { useToast } from '../composables/useToast.js'
 import SaveModal from './SaveModal.vue'
 
@@ -70,6 +70,24 @@ async function handleDelete(snap) {
 function formatDate(ts) {
   return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
 }
+
+// Safety valve — only surfaces when there are cloud designs to clear.
+const hasCloud = computed(() => snapshots.value.some(s => s.source === 'cloud'))
+const clearing = ref(false)
+
+async function handleClearCloud() {
+  if (!window.confirm('Delete ALL of your saved cloud designs? This cannot be undone.')) return
+  clearing.value = true
+  try {
+    const { deleted } = await clearCloudDesigns()
+    addToast(`Cleared ${deleted} cloud ${deleted === 1 ? 'design' : 'designs'}`, { type: 'success' })
+    refresh()
+  } catch {
+    addToast('Couldn’t clear your cloud designs', { type: 'error' })
+  } finally {
+    clearing.value = false
+  }
+}
 </script>
 
 <template>
@@ -115,11 +133,32 @@ function formatDate(ts) {
         </div>
       </div>
     </div>
+
+    <button
+      v-if="hasCloud"
+      class="snap-clear-cloud"
+      :disabled="clearing"
+      @click="handleClearCloud"
+    >{{ clearing ? 'Clearing…' : 'Clear my cloud designs' }}</button>
   </div>
 </template>
 
 <style scoped>
 .snap-header { margin-bottom: 10px; }
+
+.snap-clear-cloud {
+  display: block;
+  margin: 12px auto 2px;
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 10.5px;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.snap-clear-cloud:hover:not(:disabled) { color: #e05555; text-decoration: underline; }
+.snap-clear-cloud:disabled { opacity: 0.6; cursor: default; }
 
 .snap-save-btn {
   width: 100%;
