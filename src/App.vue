@@ -1074,7 +1074,7 @@ function stepBg(dir) {
             <LogoMark class="logo-mark-inline" />
             <div class="logo-text">
               <p class="logo"><span class="logo-title">Crest Foundry<i class="logo-ember e1" /><i class="logo-ember e2" /><i class="logo-ember e3" /><i class="logo-ember e4" /><i class="logo-ember e5" /></span></p>
-              <a class="logo-byline" href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">A project by Jason M Harrison</a>
+              <p class="logo-byline">Forge Your Club's Legacy</p>
             </div>
           </div>
           <div class="logo-actions">
@@ -1510,13 +1510,12 @@ function stepBg(dir) {
   gap: 1px;
 }
 .logo-byline {
+  margin: 0;
   font-size: 10px;
+  font-style: italic;
   color: #888;
-  text-decoration: none;
   letter-spacing: 0.02em;
-  transition: color 0.15s;
 }
-.logo-byline:hover { color: #e8c84a; }
 
 /* Embers drifting up off the "Crest Foundry" logotype */
 .logo-title {

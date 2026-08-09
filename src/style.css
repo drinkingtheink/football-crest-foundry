@@ -6,6 +6,9 @@
   --accent-warm-soft: rgba(255, 122, 46, 0.45);
   --accent-warm-glow: rgba(255, 122, 46, 0.55);
   --accent-admin: #00e5ff;
+  /* Teal — reserved for links to the maker (drinkingtheink.com / credit). */
+  --accent-teal: #2fd4c6;
+  --accent-teal-bright: #6cebe0;
 }
 
 *, *::before, *::after {

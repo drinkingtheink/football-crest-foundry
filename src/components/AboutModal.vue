@@ -1,4 +1,6 @@
 <script setup>
+import LogoMark from './LogoMark.vue'
+
 defineProps({ open: Boolean })
 defineEmits(['close'])
 
@@ -12,7 +14,13 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
         <div class="about-modal" role="dialog" aria-label="About Crest Foundry">
           <button class="about-close" title="Close" @click="$emit('close')">×</button>
 
-          <h2 class="about-title">⚒ Crest Foundry</h2>
+          <div class="logo-block">
+            <LogoMark class="logo-mark-inline" />
+            <div class="logo-text">
+              <p class="logo"><span class="logo-title">Crest Foundry<i class="logo-ember e1" /><i class="logo-ember e2" /><i class="logo-ember e3" /><i class="logo-ember e4" /><i class="logo-ember e5" /></span></p>
+              <p class="logo-byline">Forge Your Club's Legacy</p>
+            </div>
+          </div>
           <p class="about-tagline">Design and export a crest for any club — football, scholastic, recreational, intramural, social, role-playing, and more.</p>
           <p class="about-byline">A project by <a href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">Jason M Harrison</a></p>
 
@@ -82,12 +90,65 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
 }
 .about-close:hover { border-color: #e05555; color: #e05555; }
 
-.about-title {
-  margin: 0 0 4px;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+/* Header mirrors the config panel's logo block */
+.logo-block {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 14px;
+}
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.logo {
+  font-family: 'Yeseva One', Georgia, serif;
+  font-size: 23px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  line-height: 1.05;
   color: #e8c84a;
+  margin: 0;
+}
+.logo-byline {
+  margin: 0;
+  font-size: 10px;
+  font-style: italic;
+  color: #888;
+  letter-spacing: 0.02em;
+}
+
+/* Embers drifting up off the "Crest Foundry" logotype */
+.logo-title {
+  position: relative;
+  display: inline-block;
+}
+.logo-ember {
+  position: absolute;
+  bottom: 3px;
+  width: 2.5px;
+  height: 2.5px;
+  border-radius: 50%;
+  background: #ffd98a;
+  box-shadow: 0 0 5px 1px rgba(255, 140, 40, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  animation: logo-ember-rise 3.4s ease-out infinite;
+}
+.logo-ember.e1 { left: 12%; --dx: -3px; animation-duration: 3.6s; animation-delay: -0.3s; }
+.logo-ember.e2 { left: 33%; --dx: 4px;  animation-duration: 4.4s; animation-delay: -1.7s; }
+.logo-ember.e3 { left: 52%; --dx: -2px; animation-duration: 3.9s; animation-delay: -2.9s; }
+.logo-ember.e4 { left: 71%; --dx: 5px;  animation-duration: 4.7s; animation-delay: -1.0s; }
+.logo-ember.e5 { left: 89%; --dx: -4px; animation-duration: 4.1s; animation-delay: -3.3s; }
+@keyframes logo-ember-rise {
+  0%   { transform: translate(0, 0) scale(1);            opacity: 0; }
+  8%   { opacity: 0.95; }
+  55%  { opacity: 0.5; }
+  100% { transform: translate(var(--dx), -22px) scale(0.35); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-ember { display: none; }
 }
 
 .about-tagline {
@@ -102,11 +163,11 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
   color: #888;
 }
 .about-byline a {
-  color: #e8c84a;
+  color: var(--accent-teal);
   text-decoration: none;
-  border-bottom: 1px solid rgba(232, 200, 74, 0.35);
+  border-bottom: 1px solid rgba(47, 212, 198, 0.4);
 }
-.about-byline a:hover { border-bottom-color: #e8c84a; }
+.about-byline a:hover { border-bottom-color: var(--accent-teal); }
 
 .about-heading {
   margin: 0 0 6px;
