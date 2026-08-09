@@ -13,7 +13,7 @@ import AboutModal from './components/AboutModal.vue'
 import AuthModal from './components/AuthModal.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { useAuth } from './composables/useAuth.js'
-import { saveSnapshot } from './utils/snapshots.js'
+import { saveSnapshot, importLocalToCloud } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
@@ -832,7 +832,18 @@ async function handleAccountClick() {
 }
 
 // Signing in/out swaps the snapshot list between cloud and localStorage.
-watch(isSignedIn, () => { snapshotPanelRef.value?.refresh() })
+// On first sign-in, migrate this browser's local designs into the account.
+watch(isSignedIn, async (signedIn) => {
+  if (signedIn) {
+    try {
+      const { imported } = await importLocalToCloud()
+      if (imported > 0) {
+        addToast(`Imported ${imported} saved ${imported === 1 ? 'design' : 'designs'} to your account`, { type: 'success', duration: 4000 })
+      }
+    } catch {}
+  }
+  snapshotPanelRef.value?.refresh()
+})
 
 const badgeComposerRef = ref(null)
 const isExporting = ref(false)
@@ -2029,8 +2040,30 @@ function stepBg(dir) {
   display: flex;
   gap: 8px;
   align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* room so hover-scale and the active glow aren't clipped by overflow */
+  padding: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a48 transparent;
+}
+.bg-picker::-webkit-scrollbar {
+  height: 8px;
+}
+.bg-picker::-webkit-scrollbar-track {
+  background: transparent;
+}
+.bg-picker::-webkit-scrollbar-thumb {
+  background: #2f2f3b;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.bg-picker::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-warm);
+  background-clip: content-box;
 }
 
 .bg-opt {

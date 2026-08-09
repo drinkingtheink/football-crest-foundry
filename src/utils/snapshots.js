@@ -3,6 +3,7 @@ import { embedFontsInto } from './exportBadge.js'
 
 const PREFIX = 'crest-foundry:snap:'
 const LEGACY_PREFIX = 'crest-forge:snap:'
+const MIGRATED_KEY = 'crest-foundry:migrated'
 
 // When signed in, snapshots live in the Supabase `designs` table; otherwise
 // they stay in localStorage. Same public API either way, so SnapshotPanel /
@@ -54,6 +55,28 @@ export async function deleteSnapshot(id) {
     return
   }
   deleteLocal(id)
+}
+
+// One-time copy of this browser's localStorage snapshots into the signed-in
+// user's account, so existing designs follow them to the cloud. Idempotent via
+// a migrated flag; local copies are kept as-is (nothing is deleted).
+export async function importLocalToCloud() {
+  if (localStorage.getItem(MIGRATED_KEY)) return { imported: 0, alreadyDone: true }
+  const uid = await currentUserId()
+  if (!uid) return { imported: 0 }
+
+  const locals = listLocal()
+  let imported = 0
+  for (const snap of locals) {
+    try {
+      await saveCloud(uid, snap.name, snap.config, snap.thumbnail ?? null)
+      imported++
+    } catch {}
+  }
+  // Mark done regardless of partial failures — locals stay in localStorage as a
+  // backup, and this avoids re-importing (which would duplicate) on next login.
+  localStorage.setItem(MIGRATED_KEY, '1')
+  return { imported }
 }
 
 // --- Cloud (Supabase) ---
