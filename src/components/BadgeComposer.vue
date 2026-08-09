@@ -61,6 +61,33 @@ function symbolHandles(sym) {
   })
 }
 
+// A single selected straight (non-arc) text also gets corner handles — dragging
+// scales fontSize uniformly. Its box is measured live (no stored size).
+const resizeText = computed(() => {
+  if (props.selection.length !== 1 || props.selection[0].type !== 'text') return null
+  const t = props.config.texts.find(x => x.id === props.selection[0].id)
+  return t && !t.arc ? t : null
+})
+
+function textBBox(text) {
+  const el = svgRootEl.value?.querySelector(`[data-text-id="${text.id}"]`)
+  if (!el) return null
+  try { return el.getBBox() } catch { return null }
+}
+
+function textHandles(text) {
+  const bb = textBBox(text)
+  if (!bb) return []
+  const cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2
+  const r = (text.rotation || 0) * Math.PI / 180
+  const cos = Math.cos(r), sin = Math.sin(r)
+  return CORNER_DIRS.map(([hx, hy]) => {
+    const px = cx + hx * bb.width / 2, py = cy + hy * bb.height / 2   // corner, pre-rotation
+    const dx = px - text.x, dy = py - text.y                          // rotation is about (x,y)
+    return { hx, hy, x: text.x + dx * cos - dy * sin, y: text.y + dx * sin + dy * cos }
+  })
+}
+
 const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds', 'ember', 'drag-start', 'drag-end'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
@@ -250,6 +277,25 @@ function startSymbolResize(e, hx, hy) {
   e.preventDefault()
 }
 
+// Resize straight text by dragging a corner: scale fontSize uniformly around the
+// text's own centre (its anchor stays put). Box measured live via getBBox.
+function startTextResize(e, hx, hy) {
+  const text = resizeText.value
+  if (!text) return
+  e.stopPropagation()
+  const bb = textBBox(text)
+  if (!bb) return
+  const cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2
+  const r = (text.rotation || 0) * Math.PI / 180
+  const cos = Math.cos(r), sin = Math.sin(r)
+  const dxc = cx - text.x, dyc = cy - text.y
+  const centre = { x: text.x + dxc * cos - dyc * sin, y: text.y + dxc * sin + dyc * cos }
+  const d0 = Math.hypot(bb.width / 2, bb.height / 2) || 1   // half-diagonal (rotation-invariant)
+  drag.value = { mode: 'resize-text', id: text.id, centre, d0, fontSize0: text.fontSize }
+  emit('drag-start')
+  e.preventDefault()
+}
+
 function onMove(e) {
   if (!drag.value) return
 
@@ -276,6 +322,16 @@ function onMove(e) {
     const cx = anchor.x + (hx * newSize / 2) * u.x + (hy * newSize / 2) * v.x
     const cy = anchor.y + (hx * newSize / 2) * u.y + (hy * newSize / 2) * v.y
     emit('update-symbol', drag.value.id, { size: Math.round(newSize), x: cx, y: cy })
+    emit('ember', e.clientX, e.clientY)
+    return
+  }
+
+  if (drag.value.mode === 'resize-text') {
+    const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
+    const { centre, d0, fontSize0 } = drag.value
+    const scale = Math.hypot(pt.x - centre.x, pt.y - centre.y) / d0
+    const newSize = Math.max(6, Math.min(80, Math.round(fontSize0 * scale)))
+    emit('update-text', drag.value.id, { fontSize: newSize })
     emit('ember', e.clientX, e.clientY)
     return
   }
@@ -835,6 +891,18 @@ const gradLine = computed(() => {
         class="resize-handle"
         :style="{ cursor: handleCursor(h) }"
         @mousedown="startSymbolResize($event, h.hx, h.hy)"
+      />
+    </g>
+
+    <!-- Corner resize handles for a single selected straight text (scales fontSize) -->
+    <g v-if="resizeText" data-export-hide>
+      <circle
+        v-for="(h, i) in textHandles(resizeText)"
+        :key="i"
+        :cx="h.x" :cy="h.y" r="3.4"
+        class="resize-handle"
+        :style="{ cursor: handleCursor(h) }"
+        @mousedown="startTextResize($event, h.hx, h.hy)"
       />
     </g>
 

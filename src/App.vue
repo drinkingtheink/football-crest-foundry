@@ -817,10 +817,25 @@ function onDocumentClick(e) {
   deselectAll()
 }
 
+// On phones the app is gated behind a shim; keep the crest beneath it lively by
+// forging a fresh one every few seconds (skipped under reduced motion).
+let mobileForgeTimer = null
+let mobileMql = null
+function updateMobileForge() {
+  clearInterval(mobileForgeTimer)
+  mobileForgeTimer = null
+  if (mobileMql?.matches && !reduceMotion) {
+    mobileForgeTimer = setInterval(() => randomizeAll(), 7000)
+  }
+}
+
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
   window.addEventListener('resize', sizeCanvas)
   document.addEventListener('click', onDocumentClick)
+  mobileMql = window.matchMedia('(max-width: 768px)')
+  mobileMql.addEventListener('change', updateMobileForge)
+  updateMobileForge()
   nextTick(() => {
     sizeCanvas()
     if (particleCanvas.value) {
@@ -835,6 +850,8 @@ onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
   window.removeEventListener('resize', sizeCanvas)
   document.removeEventListener('click', onDocumentClick)
+  mobileMql?.removeEventListener('change', updateMobileForge)
+  clearInterval(mobileForgeTimer)
   clearTimeout(emberTimer)
   clearTimeout(weldDelayTimer)
   clearTimeout(weldCooldownTimer)
@@ -1031,8 +1048,14 @@ function stepBg(dir) {
 <template>
   <div class="app">
     <div class="mobile-gate" aria-hidden="true">
-      <LogoMark class="mobile-gate-logo" />
-      <p class="mobile-gate-msg">The Foundry works best on tablet and up — Thx CF mgmt</p>
+      <span class="mobile-gate-logo-wrap">
+        <LogoMark class="mobile-gate-logo" />
+        <span class="gate-embers" aria-hidden="true">
+          <i class="gember g1" /><i class="gember g2" /><i class="gember g3" /><i class="gember g4" /><i class="gember g5" /><i class="gember g6" /><i class="gember g7" /><i class="gember g8" /><i class="gember g9" /><i class="gember g10" /><i class="gember g11" /><i class="gember g12" />
+        </span>
+      </span>
+      <p class="logo mobile-gate-wordmark"><span class="logo-title">Crest Foundry<i class="logo-ember e1" /><i class="logo-ember e2" /><i class="logo-ember e3" /><i class="logo-ember e4" /><i class="logo-ember e5" /></span></p>
+      <p class="mobile-gate-msg">The Foundry works best on tablet and up — Thx</p>
     </div>
     <AppBackground :type="appBg" :tone="patternTone" />
     <div
@@ -1693,16 +1716,84 @@ function stepBg(dir) {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 28px;
+    gap: 18px;
     padding: 32px;
     text-align: center;
-    background: rgba(0, 0, 0, 0.82);
-    backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px) saturate(1.9);
+    -webkit-backdrop-filter: blur(6px) saturate(1.9);
+  }
+  /* Hide the controls/admin panel entirely; let the crest sit centered behind the shim */
+  .controls-pane { display: none !important; }
+  .preview-pane {
+    justify-content: center !important;
+    padding: 24px !important;
+    gap: 0 !important;
+  }
+  .preview-pane .scene-wrap,
+  .preview-pane .bg-arrow,
+  .preview-pane .align-bar { display: none !important; }
+  .mobile-gate-logo-wrap {
+    position: relative;
+    display: inline-flex;
+    line-height: 0;
   }
   .app .mobile-gate .mobile-gate-logo {
-    width: min(44vw, 220px);
+    width: min(40vw, 190px);
     height: auto;
     aspect-ratio: 543.67 / 627.4;
+  }
+  /* Embers drifting up off the logo — same treatment as the modal headers */
+  .gate-embers {
+    position: absolute;
+    top: 8%;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    pointer-events: none;
+  }
+  .gate-embers .gember {
+    position: absolute;
+    top: 0;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #ffe0a0;
+    box-shadow: 0 0 5px 1px rgba(255, 140, 40, 0.9);
+    opacity: 0;
+    animation: gate-ember-rise 3.4s ease-out infinite;
+  }
+  .gate-embers .gember:nth-child(3n) {
+    width: 4px;
+    height: 4px;
+    background: #fff1c6;
+    box-shadow: 0 0 9px 1.5px rgba(255, 155, 50, 1);
+  }
+  .gate-embers .g1  { left: 6%;  --dx: -7px; animation-duration: 3.2s; animation-delay: -0.2s; }
+  .gate-embers .g2  { left: 15%; --dx: 5px;  animation-duration: 4.1s; animation-delay: -1.4s; }
+  .gate-embers .g3  { left: 24%; --dx: -4px; animation-duration: 3.6s; animation-delay: -2.7s; }
+  .gate-embers .g4  { left: 33%; --dx: 8px;  animation-duration: 4.4s; animation-delay: -0.8s; }
+  .gate-embers .g5  { left: 42%; --dx: -3px; animation-duration: 3.9s; animation-delay: -2.1s; }
+  .gate-embers .g6  { left: 50%; --dx: 6px;  animation-duration: 3.4s; animation-delay: -3.3s; }
+  .gate-embers .g7  { left: 58%; --dx: -8px; animation-duration: 4.6s; animation-delay: -1.1s; }
+  .gate-embers .g8  { left: 67%; --dx: 3px;  animation-duration: 3.7s; animation-delay: -2.5s; }
+  .gate-embers .g9  { left: 76%; --dx: -5px; animation-duration: 4.2s; animation-delay: -0.5s; }
+  .gate-embers .g10 { left: 85%; --dx: 7px;  animation-duration: 3.5s; animation-delay: -1.9s; }
+  .gate-embers .g11 { left: 92%; --dx: -4px; animation-duration: 4.5s; animation-delay: -3.0s; }
+  .gate-embers .g12 { left: 30%; --dx: 5px;  animation-duration: 3.6s; animation-delay: -3.5s; }
+  @keyframes gate-ember-rise {
+    0%   { transform: translate(0, 0) scale(1);               opacity: 0; }
+    8%   { opacity: 1; }
+    55%  { opacity: 0.5; }
+    100% { transform: translate(var(--dx), -70px) scale(0.25); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gate-embers { display: none; }
+  }
+  .mobile-gate-wordmark {
+    font-size: clamp(28px, 8vw, 40px);
+    line-height: 1;
+    text-align: center;
   }
   .mobile-gate-msg {
     margin: 0;
