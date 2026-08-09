@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import BadgeComposer from './BadgeComposer.vue'
 import AppBackground from './AppBackground.vue'
+import BackgroundPicker from './BackgroundPicker.vue'
 import LogoMark from './LogoMark.vue'
 import { exportCrestPng, exportCrestSvg, crestFilename } from '../utils/exportBadge.js'
 
@@ -13,8 +14,9 @@ const props = defineProps({
   bgType: { type: String, default: 'none' },
   tone: { type: String, default: 'dark' },
   overlay: { type: Object, default: null },   // { color, opacity } for image backgrounds
+  palette: { type: Array, default: () => [] }, // tints the picker thumbs to match the backdrop
 })
-const emit = defineEmits(['remix', 'close', 'step-bg'])
+const emit = defineEmits(['remix', 'close', 'step-bg', 'set-bg', 'set-tone'])
 
 const composerRef = ref(null)
 const exporting = ref(false)
@@ -74,6 +76,17 @@ async function download(format) {
           </div>
 
           <button class="shared-make" @click="emit('close')">Make your own crest →</button>
+        </div>
+
+        <div class="shared-bg-pill">
+          <BackgroundPicker
+            :bg="bgType"
+            :tone="tone"
+            :palette="palette"
+            :overlay="overlay"
+            @update:bg="emit('set-bg', $event)"
+            @update:tone="emit('set-tone', $event)"
+          />
         </div>
       </template>
     </div>
@@ -176,6 +189,18 @@ async function download(format) {
 .shared-stage {
   pointer-events: none;   /* read-only crest */
   filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.55));
+}
+
+/* Background picker pill, matching the other floating panels */
+.shared-bg-pill {
+  max-width: min(460px, calc(100vw - 32px));
+  padding: 8px 12px;
+  background: rgba(15, 15, 19, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Legible panel behind the name + actions, matching the logo pill */

@@ -16,6 +16,7 @@ import { useAuth } from './composables/useAuth.js'
 import { saveSnapshot, updateSnapshot, importLocalToCloud, shareDesign, unshareDesign, getSharedDesign } from './utils/snapshots.js'
 import ShareModal from './components/ShareModal.vue'
 import SharedView from './components/SharedView.vue'
+import { bgOptions, imageBgTypes, patternTonedTypes, patternTones } from './data/backgrounds.js'
 import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
@@ -75,10 +76,6 @@ const clipboard = ref(null)
 
 const bgTypes = ['solid', 'gradient', 'radial', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal', 'checkered', 'saltire', 'sunburst']
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal', 'checkered'])
-const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch', 'stone', 'wood'])
-// Patterns that respond to the Dark/Medium/Light tone selector.
-const patternTonedTypes = new Set(['waves', 'crisscross', 'pinstripe', 'diamonds', 'dots', 'grid', 'zigzag'])
-const patternTones = ['dark', 'medium', 'light']
 
 // Auto-scroll sidebar to selected symbol row
 const symRefs = {}
@@ -92,25 +89,6 @@ watch(selectedSymbolId, async (id) => {
   await nextTick()
   setTimeout(() => symRefs[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120)
 })
-
-const bgOptions = [
-  { id: 'grass',       label: 'Grass',      thumb: '/backgrounds/grass.jpg', isImgOption: true },
-  { id: 'stadium',     label: 'Stadium',    thumb: '/backgrounds/stadium.jpg', isImgOption: true },
-  { id: 'fabric',      label: 'Fabric',     thumb: '/backgrounds/fabric.png', isImgOption: true },
-  { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg', isImgOption: true },
-  { id: 'pitch',       label: 'Pitch',      thumb: '/backgrounds/pitch.png', isImgOption: true },
-  { id: 'stone',       label: 'Stone Wall', thumb: '/backgrounds/stone.jpg', isImgOption: true },
-  { id: 'wood',        label: 'Wood',       thumb: '/backgrounds/wood.jpg', isImgOption: true },
-  { id: 'bokeh',       label: 'Bokeh' },
-  { id: 'aurora',      label: 'Aurora' },
-  { id: 'waves',       label: 'Waves' },
-  { id: 'crisscross',  label: 'Criss-Cross' },
-  { id: 'pinstripe',   label: 'Pinstripe' },
-  { id: 'diamonds',    label: 'Diamonds' },
-  { id: 'dots',        label: 'Dots' },
-  { id: 'grid',        label: 'Grid' },
-  { id: 'zigzag',      label: 'Zigzag' },
-]
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
 const patternTone = ref('dark')
@@ -1013,9 +991,12 @@ function stepBg(dir) {
       :bg-type="sharedBg"
       :tone="sharedTone"
       :overlay="imageBgTypes.has(sharedBg) ? overlay : null"
+      :palette="config.palette"
       @remix="onRemixShared"
       @close="onCloseShared"
       @step-bg="stepSharedBg"
+      @set-bg="sharedBg = $event"
+      @set-tone="sharedTone = $event"
     />
     <main class="app-body">
       <!-- Preview -->
