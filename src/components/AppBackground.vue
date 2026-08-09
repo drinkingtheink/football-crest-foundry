@@ -18,6 +18,7 @@ const imageMap = {
   stadium:   '/backgrounds/stadium.jpg',
   pitch:     '/backgrounds/pitch.png',
   stone:     '/backgrounds/stone.jpg',
+  wood:      '/backgrounds/wood.jpg',
 }
 
 // Per-image focal anchor for `cover` cropping. The stadium photo is 4:3 with the

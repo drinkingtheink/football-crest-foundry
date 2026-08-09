@@ -70,7 +70,7 @@ const clipboard = ref(null)
 
 const bgTypes = ['solid', 'gradient', 'radial', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal', 'checkered', 'saltire', 'sunburst']
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal', 'checkered'])
-const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch', 'stone'])
+const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch', 'stone', 'wood'])
 // Patterns that respond to the Dark/Medium/Light tone selector.
 const patternTonedTypes = new Set(['waves', 'crisscross', 'pinstripe', 'diamonds', 'dots', 'grid', 'zigzag'])
 const patternTones = ['dark', 'medium', 'light']
@@ -95,6 +95,7 @@ const bgOptions = [
   { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg', isImgOption: true },
   { id: 'pitch',       label: 'Pitch',      thumb: '/backgrounds/pitch.png', isImgOption: true },
   { id: 'stone',       label: 'Stone Wall', thumb: '/backgrounds/stone.jpg', isImgOption: true },
+  { id: 'wood',        label: 'Wood',       thumb: '/backgrounds/wood.jpg', isImgOption: true },
   { id: 'bokeh',       label: 'Bokeh' },
   { id: 'aurora',      label: 'Aurora' },
   { id: 'waves',       label: 'Waves' },
