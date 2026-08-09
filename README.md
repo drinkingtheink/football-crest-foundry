@@ -1,6 +1,8 @@
 # Crest Foundry
 
-A browser-based club crest creator for designing custom badges for any club — football/soccer, scholastic, recreational, intramural, social, role-playing, and more. Combine shield shapes, heraldic symbols, background patterns, text, and borders — then snapshot your work for later.
+A browser-based club crest creator for designing custom badges for any club — football/soccer, scholastic, recreational, intramural, social, role-playing, and more. Combine shield shapes, heraldic symbols, background patterns, text, and borders — then save your work to the cloud, share it with a link, or export it as a PNG/SVG.
+
+> **Forge Your Club's Legacy.** Live at [crest-foundry.jasonmharrison.info](https://crest-foundry.jasonmharrison.info/)
 
 ---
 
@@ -36,12 +38,15 @@ A browser-based club crest creator for designing custom badges for any club — 
 - **Text layers** — straight or arc text with font, size, weight, letter-spacing, and color controls; drag to reposition, scroll to resize
 - **Border** — adjustable color and thickness
 - **Club color palette** — load real club colors or build a custom palette of up to 6 colors
-- **Scene backgrounds** — Bokeh, Aurora, Waves, Criss-Cross, and photo backgrounds (grass, stadium, fabric, brick, pitch) with overlay color and opacity control
+- **Scene backgrounds** — Bokeh, Aurora, and tinted patterns (Waves, Criss-Cross, Pinstripe, Diamonds, Dots, Grid, Zigzag) plus photo backgrounds (grass, stadium, fabric, brick, pitch, stone, wood), with dark/medium/light tone control and overlay color + opacity
 - **Drag & drop** — drag symbols and text freely within the badge canvas
 - **Arrow key nudging** — 1px steps, Shift+Arrow for 10px
 - **Scroll to resize** — scroll over any symbol or text element to resize it in place
 - **Randomizer** — Space bar or ⚄ button generates a random badge from real club color data
-- **Snapshots** — save named design snapshots (config + thumbnail) to localStorage; load or delete from the in-app library; Cmd+S shortcut
+- **Snapshots** — save named designs (config + thumbnail); load or delete from the in-app library; Cmd+S shortcut. Stored in **your account when signed in**, otherwise in the browser (localStorage)
+- **Accounts & cloud sync** — optional sign-in with **Google** or an **email magic link**; designs save to your account and sync across devices. The app works fully **anonymously** too (local-only), and your local designs migrate into your account on first sign-in
+- **Edit in place** — load a saved crest and **update** it, or keep a separate **copy**
+- **Sharing** — share any saved crest via an unguessable link; recipients get a **read-only view** with the animated background (browse/pick your own), PNG/SVG download, and one-click **Remix** into their own editor
 - **Export** — download your crest as a transparent **PNG** or a self-contained **SVG** (see below)
 
 ---
@@ -144,12 +149,34 @@ Both files are named `crest-foundry-<club-name>.<ext>`.
 
 ---
 
+## Accounts & Cloud
+
+Sign-in is **optional** — the app is fully usable anonymously, with designs kept in the browser. Signing in unlocks cloud save and cross-device sync.
+
+- **Passwordless auth** — **Continue with Google** (OAuth) or an **email magic link**, handled by [Supabase Auth](https://supabase.com/auth). No passwords stored.
+- **Cloud designs** — saved crests live in a Postgres `designs` table, guarded by **Row-Level Security** so you only ever see your own.
+- **One-time import** — the first time you sign in, any designs saved locally in that browser are migrated into your account (idempotent — no duplicates on re-runs).
+- **Graceful degradation** — with no Supabase config present, the app silently falls back to local-only mode.
+
+## Sharing
+
+Share a saved crest with anyone via an **unguessable, link-only** URL (`?c=<token>`).
+
+- **Read-only view** — recipients (no account needed) see the crest on the same animated backdrop as the editor, which they can **browse/re-pick**, with the crest's palette tinting the scene.
+- **Download & Remix** — viewers can grab the **PNG/SVG** or **Remix** the crest, which loads it into their own editor as a fresh design.
+- **Security** — links resolve through a `SECURITY DEFINER` Postgres function that returns only the one matching crest, so shared designs are never enumerable and owner identity is never exposed. Sharing can be **revoked** at any time.
+
+---
+
 ## Stack
 
 - **Vue 3** + **Vite** (no TypeScript)
 - **Plain scoped CSS** — no utility framework
 - **opentype.js** — SVG-export text→outline (lazy-loaded only on export)
-- No backend (Phase 2: Supabase for save/share/gallery)
+- **Supabase** — Postgres + Auth + Row-Level Security for accounts, cloud save, and link-only sharing (`@supabase/supabase-js`; anonymous/local-only when unconfigured)
+- **Netlify** — static hosting + CI from GitHub (`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` set as build env vars)
+
+> _A public browse gallery and per-crest social preview images are possible future additions._
 
 ---
 
@@ -161,20 +188,36 @@ src/
     BadgeComposer.vue       # SVG renderer + drag handling
     IconPicker.vue          # Symbol gallery
     TextEditor.vue          # Text element list + controls
-    SnapshotPanel.vue       # Save/load design snapshots
+    SnapshotPanel.vue       # Save/load/share snapshots (cloud or local)
+    SaveModal.vue           # Save / update-in-place dialog
+    ShareModal.vue          # Share-link dialog (copy / revoke)
+    SharedView.vue          # Read-only view for a shared crest (?c=<token>)
+    AuthModal.vue           # Sign-in (Google + email magic link)
+    BackgroundPicker.vue    # Scene-background gallery + tone/overlay controls
+    AppBackground.vue       # Animated page backdrop
+    AboutModal.vue          # About / credits / Terms & Privacy links
   composables/
     useBadgeConfig.js       # All reactive badge state + mutations
+    useAuth.js              # Supabase auth/session (singleton)
+    useToast.js             # Toast queue
   data/
     clubs.js                # Real club color palettes
-    icons.js                # 260+ heraldic SVG symbols (many imported from game-icons.net)
+    icons.js                # heraldic SVG symbols (many imported from game-icons.net)
     shapes.js               # Shield shape path definitions
-    symbols-to-be-processed/  # Staging directory for incoming SVGs
+    backgrounds.js          # Scene-background option list (shared: editor + shared view)
+  lib/
+    supabase.js             # Supabase client (gated on env; null when unconfigured)
   utils/
-    snapshots.js            # localStorage snapshot save/load/capture
+    snapshots.js            # Save/load/delete/share designs (Supabase or localStorage)
+    exportBadge.js          # PNG + SVG export
     arcPath.js              # SVG arc path generator for text
-    exportBadge.js          # PNG + SVG export (planned)
+    patterns.js, bokeh.js, particles.js   # Backdrop + spark effects
   App.vue
   style.css
+supabase/
+  migrations/               # designs table + RLS, dedup, sharing RPC
+public/
+  terms.html, privacy.html  # static legal pages (linked from the About dialog)
 scripts/
   import-game-icons.mjs     # Authoring tool: import icons from game-icons.net into icons.js
 designs/                    # Saved badge screenshots
@@ -188,6 +231,15 @@ designs/                    # Saved badge screenshots
 npm install
 npm run dev
 ```
+
+The app runs anonymously (local-only) out of the box. To enable accounts, cloud save, and sharing, copy `.env.example` to `.env` and add your Supabase project's URL and publishable (anon) key:
+
+```bash
+cp .env.example .env
+# VITE_SUPABASE_URL=...        VITE_SUPABASE_ANON_KEY=...
+```
+
+Then apply the SQL in `supabase/migrations/` (dashboard SQL Editor), and add your dev/prod origins to Supabase → Auth → URL Configuration (and your OAuth provider's origins).
 
 ---
 
