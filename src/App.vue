@@ -624,6 +624,9 @@ const sharedLoading = ref(sharedActive.value)
 const sharedError   = ref(false)
 const sharedConfig  = ref(null)
 const sharedName    = ref('')
+// Like forging a crest, the shared page rolls its own random backdrop each load.
+const sharedBg      = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
+const sharedTone    = ref(patternTones[Math.floor(Math.random() * patternTones.length)])
 
 onMounted(async () => {
   if (!sharedActive.value) return
@@ -1002,9 +1005,9 @@ function stepBg(dir) {
       :name="sharedName"
       :loading="sharedLoading"
       :error="sharedError"
-      :bg-type="appBg"
-      :tone="patternTone"
-      :overlay="imageBgTypes.has(appBg) ? overlay : null"
+      :bg-type="sharedBg"
+      :tone="sharedTone"
+      :overlay="imageBgTypes.has(sharedBg) ? overlay : null"
       @remix="onRemixShared"
       @close="onCloseShared"
     />
