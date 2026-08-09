@@ -605,6 +605,8 @@ const sharedName    = ref('')
 // Like forging a crest, the shared page rolls its own random backdrop each load.
 const sharedBg      = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
 const sharedTone    = ref(patternTones[Math.floor(Math.random() * patternTones.length)])
+// Its own overlay state, tinted from the shared crest's palette (not the editor's).
+const sharedOverlay = reactive({ color: '#000000', opacity: 0.7 })
 
 onMounted(async () => {
   if (!sharedActive.value) return
@@ -614,6 +616,7 @@ onMounted(async () => {
     if (d) {
       sharedConfig.value = d.config
       sharedName.value = d.name
+      sharedOverlay.color = d.config?.palette?.[0] ?? '#000000'
       loadConfigFonts(d.config)          // so the shared crest renders in its real fonts
       document.title = `${d.name} — Crest Foundry`
     } else {
@@ -990,8 +993,8 @@ function stepBg(dir) {
       :error="sharedError"
       :bg-type="sharedBg"
       :tone="sharedTone"
-      :overlay="imageBgTypes.has(sharedBg) ? overlay : null"
-      :palette="config.palette"
+      :overlay="imageBgTypes.has(sharedBg) ? sharedOverlay : null"
+      :palette="sharedConfig?.palette || []"
       @remix="onRemixShared"
       @close="onCloseShared"
       @step-bg="stepSharedBg"

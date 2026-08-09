@@ -38,7 +38,7 @@ async function download(format) {
 
 <template>
   <div class="shared-view">
-    <AppBackground :type="bgType" :tone="tone" />
+    <AppBackground :type="bgType" :tone="tone" :palette="palette" />
     <div v-if="overlay" class="shared-overlay" :style="{ background: overlay.color, opacity: overlay.opacity }" />
 
     <button class="shared-bg-arrow left" title="Previous background" @click="emit('step-bg', -1)">‹</button>

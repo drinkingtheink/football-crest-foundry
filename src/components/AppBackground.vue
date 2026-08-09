@@ -7,9 +7,13 @@ import { wavesBg, crisscrossBg, pinstripeBg, diamondsBg, dotsBg, gridBg, zigzagB
 const props = defineProps({
   type: { type: String, default: 'none' },
   tone: { type: String, default: 'dark' },
+  palette: { type: Array, default: null },   // override the crest palette (e.g. shared view)
 })
 
 const { config } = useBadgeConfig()
+
+// Tint from the given palette when provided, otherwise the live crest's.
+const activePalette = computed(() => (props.palette && props.palette.length) ? props.palette : config.palette)
 
 const imageMap = {
   grass:     '/backgrounds/grass.jpg',
@@ -53,13 +57,14 @@ function auroraRibbonsFor(palette) {
 }
 
 function styleFor(type) {
-  if (type === 'waves')      return wavesBg(config.palette, props.tone)
-  if (type === 'crisscross') return crisscrossBg(config.palette, props.tone)
-  if (type === 'pinstripe')  return pinstripeBg(config.palette, props.tone)
-  if (type === 'diamonds')   return diamondsBg(config.palette, props.tone)
-  if (type === 'dots')       return dotsBg(config.palette, props.tone)
-  if (type === 'grid')       return gridBg(config.palette, props.tone)
-  if (type === 'zigzag')     return zigzagBg(config.palette, props.tone)
+  const pal = activePalette.value
+  if (type === 'waves')      return wavesBg(pal, props.tone)
+  if (type === 'crisscross') return crisscrossBg(pal, props.tone)
+  if (type === 'pinstripe')  return pinstripeBg(pal, props.tone)
+  if (type === 'diamonds')   return diamondsBg(pal, props.tone)
+  if (type === 'dots')       return dotsBg(pal, props.tone)
+  if (type === 'grid')       return gridBg(pal, props.tone)
+  if (type === 'zigzag')     return zigzagBg(pal, props.tone)
   if (imageMap[type])        return { backgroundImage: `url(${imageMap[type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: imagePos[type] || 'center' }
   return {}
 }
@@ -82,7 +87,7 @@ let bokehOutgoing = null
 
 function initBokehOn(canvas, store) {
   if (!canvas) return null
-  const inst = startBokeh(canvas, () => config.palette)
+  const inst = startBokeh(canvas, () => activePalette.value)
   return inst
 }
 
@@ -90,7 +95,7 @@ function startCurrentBokeh() {
   bokehCurrent?.stop()
   bokehCurrent = null
   nextTick(() => {
-    if (bokehCanvas.value) bokehCurrent = startBokeh(bokehCanvas.value, () => config.palette)
+    if (bokehCanvas.value) bokehCurrent = startBokeh(bokehCanvas.value, () => activePalette.value)
   })
 }
 
@@ -159,7 +164,7 @@ onUnmounted(() => {
     <canvas v-if="outgoing === 'bokeh'" ref="bokehCanvasOut" class="bokeh-canvas" />
     <div v-if="outgoing === 'aurora'" class="aurora-layer">
       <div
-        v-for="(r, i) in auroraRibbonsFor(config.palette)"
+        v-for="(r, i) in auroraRibbonsFor(activePalette)"
         :key="i"
         class="aurora-ribbon"
         :class="`ribbon-${i}`"
@@ -173,7 +178,7 @@ onUnmounted(() => {
     <canvas v-if="current === 'bokeh'" ref="bokehCanvas" class="bokeh-canvas" />
     <div v-if="current === 'aurora'" class="aurora-layer">
       <div
-        v-for="(r, i) in auroraRibbonsFor(config.palette)"
+        v-for="(r, i) in auroraRibbonsFor(activePalette)"
         :key="i"
         class="aurora-ribbon"
         :class="`ribbon-${i}`"
