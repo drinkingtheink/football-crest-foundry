@@ -123,12 +123,19 @@ async function download(format) {
 
 .shared-logo {
   position: fixed;
-  top: 20px;
-  left: 24px;
+  top: 16px;
+  left: 16px;
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
+  padding: 8px 16px 8px 12px;
+  background: rgba(15, 15, 19, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 .shared-logo-mark { flex: none; }
 .shared-logo-text { display: flex; flex-direction: column; gap: 1px; }
