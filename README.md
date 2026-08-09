@@ -46,6 +46,82 @@ A browser-based club crest creator for designing custom badges for any club — 
 
 ---
 
+## Shield Shapes
+
+Build your crest on any of these 47 shield silhouettes — traditional heraldic shields, geometric forms, and ornate crests. Previews adapt to light and dark themes.
+
+<table>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/traditional-english.svg" width="104" alt="Traditional English shield shape" /><br/><sub>Traditional English</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/pointed-heraldic.svg" width="104" alt="Pointed Heraldic shield shape" /><br/><sub>Pointed Heraldic</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/heater-wide.svg" width="104" alt="Wide Heater shield shape" /><br/><sub>Wide Heater</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/chevron-bottom.svg" width="104" alt="Chevron Bottom shield shape" /><br/><sub>Chevron Bottom</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/rounded-rect.svg" width="104" alt="Rounded Rectangle shield shape" /><br/><sub>Rounded Rectangle</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/sh-classic.svg" width="104" alt="Classic shield shape" /><br/><sub>Classic</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-notched.svg" width="104" alt="Notched Corners shield shape" /><br/><sub>Notched Corners</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-ornate.svg" width="104" alt="Ornate Top shield shape" /><br/><sub>Ornate Top</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-waisted.svg" width="104" alt="Waisted shield shape" /><br/><sub>Waisted</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-wide.svg" width="104" alt="Wide shield shape" /><br/><sub>Wide</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/sh-tall.svg" width="104" alt="Tall shield shape" /><br/><sub>Tall</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-arch.svg" width="104" alt="Arch Top shield shape" /><br/><sub>Arch Top</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-gothic.svg" width="104" alt="Gothic Arch shield shape" /><br/><sub>Gothic Arch</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-barrel.svg" width="104" alt="Barrel shield shape" /><br/><sub>Barrel</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-pointed-arch.svg" width="104" alt="Pointed Arch shield shape" /><br/><sub>Pointed Arch</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/sh-cat-ear.svg" width="104" alt="Cat Ear shield shape" /><br/><sub>Cat Ear</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-crown-notch.svg" width="104" alt="Crown Notch shield shape" /><br/><sub>Crown Notch</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-rounded-banner.svg" width="104" alt="Rounded Banner shield shape" /><br/><sub>Rounded Banner</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-round-heater.svg" width="104" alt="Round Heater shield shape" /><br/><sub>Round Heater</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-flat-top.svg" width="104" alt="Flat Top shield shape" /><br/><sub>Flat Top</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/sh-ornate-emblem.svg" width="104" alt="Ornate Emblem shield shape" /><br/><sub>Ornate Emblem</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-dished.svg" width="104" alt="Dished shield shape" /><br/><sub>Dished</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-cartouche.svg" width="104" alt="Cartouche shield shape" /><br/><sub>Cartouche</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-kite.svg" width="104" alt="Kite shield shape" /><br/><sub>Kite</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-rounded-triangle.svg" width="104" alt="Rounded Triangle shield shape" /><br/><sub>Rounded Triangle</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/sh-flared.svg" width="104" alt="Flared shield shape" /><br/><sub>Flared</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-gem.svg" width="104" alt="Gem shield shape" /><br/><sub>Gem</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-eared.svg" width="104" alt="Eared shield shape" /><br/><sub>Eared</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh-scalloped.svg" width="104" alt="Scalloped shield shape" /><br/><sub>Scalloped</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-fluted.svg" width="104" alt="Fluted Crest shield shape" /><br/><sub>Fluted Crest</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-banner-kite.svg" width="104" alt="Banner Kite shield shape" /><br/><sub>Banner Kite</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-regal.svg" width="104" alt="Regal Crest shield shape" /><br/><sub>Regal Crest</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-double-arch.svg" width="104" alt="Double Arch shield shape" /><br/><sub>Double Arch</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-baroque.svg" width="104" alt="Baroque shield shape" /><br/><sub>Baroque</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-lozenge.svg" width="104" alt="Lozenge shield shape" /><br/><sub>Lozenge</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-capsule.svg" width="104" alt="Capsule shield shape" /><br/><sub>Capsule</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-spade.svg" width="104" alt="Spade shield shape" /><br/><sub>Spade</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-scroll.svg" width="104" alt="Scrolled shield shape" /><br/><sub>Scrolled</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/circular.svg" width="104" alt="Circle shield shape" /><br/><sub>Circle</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/oval-portrait.svg" width="104" alt="Oval Portrait shield shape" /><br/><sub>Oval Portrait</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/oval-landscape.svg" width="104" alt="Oval Landscape shield shape" /><br/><sub>Oval Landscape</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/octagonal.svg" width="104" alt="Octagonal shield shape" /><br/><sub>Octagonal</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/hexagonal.svg" width="104" alt="Hexagonal shield shape" /><br/><sub>Hexagonal</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/sh2-hex-flat.svg" width="104" alt="Flat Hexagon shield shape" /><br/><sub>Flat Hexagon</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/pennant.svg" width="104" alt="Pennant shield shape" /><br/><sub>Pennant</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/shapes/diamond.svg" width="104" alt="Diamond shield shape" /><br/><sub>Diamond</sub></td>
+    <td align="center" valign="top"><img src="docs/shapes/starburst.svg" width="104" alt="Starburst shield shape" /><br/><sub>Starburst</sub></td>
+  </tr>
+</table>
+
+---
+
 ## Export
 
 Two one-click downloads from the badge toolbar; both have a fully transparent background outside the shield.

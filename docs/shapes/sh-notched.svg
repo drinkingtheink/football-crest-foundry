@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Notched Corners shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M 22,44 Q 22,18 46,18 L 154,18 Q 178,18 178,44 L 178,152 C 178,194 144,217 104,227 L 100,221 L 96,227 C 56,217 22,194 22,152 Z" />
+</svg>

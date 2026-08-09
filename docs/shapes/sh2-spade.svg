@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Spade shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M172.39 36.04C126.28 65.4 80.35 65.46 33.57 35.54c0 0-18.57 105.43 69.36 170.92C152.12 172.88 185 90.97 172.39 36.04Z" />
+</svg>

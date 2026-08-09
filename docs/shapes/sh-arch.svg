@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Arch Top shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M 22,46 C 22,30 40,24 58,27 C 72,20 86,15 100,13 C 114,15 128,20 142,27 C 160,24 178,30 178,46 L 178,155 C 178,196 145,218 100,228 C 55,218 22,196 22,155 Z" />
+</svg>

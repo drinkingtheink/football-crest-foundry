@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Gothic Arch shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M 22,54 C 22,36 38,26 56,32 C 72,20 88,12 100,8 C 112,12 128,20 144,32 C 162,26 178,36 178,54 L 178,158 C 178,198 145,220 100,228 C 55,220 22,198 22,158 Z" />
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Gem shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M 155.35 43.25 L 100.00 12.00 L 44.65 43.25 L 31.15 133.45 L 100.00 228.00 L 168.85 133.45 L 155.35 43.25 Z" />
+</svg>

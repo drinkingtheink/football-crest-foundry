@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Ornate Top shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M 18,42 C 18,24 34,14 54,21 C 70,12 86,22 100,22 C 114,22 130,12 146,21 C 166,14 182,24 182,42 L 182,158 C 182,198 146,220 100,228 C 54,220 18,198 18,158 Z" />
+</svg>

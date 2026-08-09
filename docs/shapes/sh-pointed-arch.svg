@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Pointed Arch shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M 3,35 C 41,35 73,24 100,0 C 126,23 156,34 191,35 C 194,35 198,39 198,41 C 204,102 198,159 152,207 C 140,218 125,226 112,236 C 104,242 97,240 88,236 C 40,211 15,171 5,122 C -1,94 -2,65 3,35 Z" />
+</svg>

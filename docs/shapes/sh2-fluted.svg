@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Fluted Crest shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M24.15 22.61c10.74 11.16 23.13 18.19 38.57 17.64 15.41-0.56 27.52-7.93 37.32-20.21 9.88 12.01 21.95 19.8 37.53 20.25 15.42 0.45 27.86-6.46 38.52-17.86 4.63 14.75 6.7 29.34 7.11 44.11 1.8 64.82-24.72 115.3-77.5 152.45-3.94 2.77-6.82 2.97-10.96 0.13C52.33 189.9 26.1 150.36 18.55 99.16 15 75.16 16.56 51.23 22.6 27.68c0.39-1.51 0.92-2.99 1.55-5.07Z" />
+</svg>

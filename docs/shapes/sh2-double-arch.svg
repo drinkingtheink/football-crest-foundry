@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Double Arch shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M38.91 47.76c23.97 6.08 44.06 0.24 60.85-17.58 16.79 17.95 37.08 23.61 60.84 17.64 4.14 8.29 8.2 16.41 12.26 24.52 2.29 4.58 4.11 9.47 6.94 13.68 5.2 7.75 4.97 15.94 3.5 24.53-8.23 48.12-35.38 81.19-79.89 100.37-2.06 0.89-5.16 0.9-7.22 0.02C51.37 191.63 24.01 158.39 16.23 109.76c-0.61-3.79-0.87-7.63-1.14-11.45-0.09-1.23-0.02-2.64 0.51-3.71 7.67-15.54 15.43-31.03 23.32-46.84Z" />
+</svg>

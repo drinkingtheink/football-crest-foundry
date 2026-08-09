@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="120" height="144" role="img" aria-label="Capsule shield shape">
+  <style>
+    .shape { fill: #24242e; stroke: #b8912e; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .shape { fill: #d9d9e0; stroke: #e8c84a; }
+    }
+  </style>
+  <path class="shape" d="M35.45 120.16c0-14.65-0.63-29.31 0.13-43.91C37.39 41.85 66.47 15 100.68 15.42c34.7 0.44 63.39 28.17 64.07 62.84 0.55 28.46 0.57 56.96 0 85.42-0.7 34.66-29.39 62.36-64.11 62.85C66.52 227 37.39 200.15 35.51 165.7c-0.83-15.13-0.15-30.35-0.14-45.54 0.03 0 0.05 0 0.08 0Z" />
+</svg>
