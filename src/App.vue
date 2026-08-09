@@ -1565,6 +1565,7 @@ function stepBg(dir) {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: -16px;
 }
 
 .randomize-btn {
