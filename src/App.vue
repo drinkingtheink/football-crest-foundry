@@ -869,7 +869,8 @@ function stepBg(dir) {
           <div v-if="alignableCount >= 1" class="align-bar">
             <button
               class="align-btn"
-              title="Center on shield"
+              data-tip="Center on shield"
+              aria-label="Center on shield"
               @click="centerOnShield"
               v-html="shieldCenterIcon()"
             />
@@ -879,7 +880,8 @@ function stepBg(dir) {
                 v-for="op in alignOps"
                 :key="op.edge"
                 class="align-btn"
-                :title="op.title"
+                :data-tip="op.title"
+                :aria-label="op.title"
                 @click="alignSelection(op.edge)"
                 v-html="alignIcon(op.edge)"
               />
@@ -890,7 +892,8 @@ function stepBg(dir) {
                 v-for="op in distributeOps"
                 :key="op.axis"
                 class="align-btn"
-                :title="op.title"
+                :data-tip="op.title"
+                :aria-label="op.title"
                 @click="distributeSelection(op.axis)"
                 v-html="distIcon(op.axis)"
               />
@@ -1665,6 +1668,7 @@ function stepBg(dir) {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 .align-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1680,6 +1684,33 @@ function stepBg(dir) {
 }
 .align-btn:hover { background: rgba(232, 200, 74, 0.14); color: #fff; }
 .align-btn :deep(svg) { display: block; }
+
+/* Styled tooltip (below the button, so it never clips off the pane top) */
+.align-btn::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-3px);
+  background: #0f0f13;
+  border: 1px solid #3a3a48;
+  border-radius: 4px;
+  color: #e8e8ec;
+  font-size: 11px;
+  font-family: system-ui, sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 3px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  z-index: 20;
+}
+.align-btn:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 .align-sep {
   width: 1px;
   align-self: stretch;
