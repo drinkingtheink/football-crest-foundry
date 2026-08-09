@@ -125,7 +125,7 @@ function outlinePointAt(t) {
   return { x: s.x, y: s.y, nx, ny, tx, ty }
 }
 
-defineExpose({ svgRootEl, outlinePointAt })
+defineExpose({ svgRootEl, shapePathEl, outlinePointAt })
 const outsidePromptedId = ref(null)
 
 // ── Alignment guides (show-only, badge centre) ─────────────────────────────

@@ -270,6 +270,32 @@ function alignSelection(edge) {
   }
 }
 
+// The shield's visual centre — the shape path's bbox centre (correct even for
+// shapes not centred at y=120). Falls back to the viewBox centre in No-Shield mode.
+function shieldCenter() {
+  const pathEl = badgeComposerRef.value?.shapePathEl
+  if (pathEl && !config.noShield) {
+    const bb = pathEl.getBBox()
+    return { cx: bb.x + bb.width / 2, cy: bb.y + bb.height / 2 }
+  }
+  return { cx: 100, cy: 120 }
+}
+
+// Move the whole selection so its bounding-box centre sits on the shield centre
+// (rigid translate — relative layout preserved). Works for a single element too.
+function centerOnShield() {
+  const boxes = selectionBoxes()
+  if (!boxes.length) return
+  const { cx, cy } = shieldCenter()
+  const gLeft = Math.min(...boxes.map(b => b.left))
+  const gRight = Math.max(...boxes.map(b => b.right))
+  const gTop = Math.min(...boxes.map(b => b.top))
+  const gBottom = Math.max(...boxes.map(b => b.bottom))
+  const dx = cx - (gLeft + gRight) / 2
+  const dy = cy - (gTop + gBottom) / 2
+  for (const b of boxes) moveBox(b, b.ax + dx, b.ay + dy)
+}
+
 // Distribute even GAPS between elements along an axis (accounts for differing
 // sizes). Endpoints hold; the middle elements are respaced so the empty space
 // between adjacent edges is equal.
@@ -304,6 +330,9 @@ const ALIGN_ICONS = {
   vcenter: '<line x1="2" y1="8" x2="14" y2="8" stroke="#e8c84a" stroke-width="1.4"/><rect x="4.4" y="3.5" width="2.2" height="9" rx="1" fill="currentColor"/><rect x="9.4" y="5.25" width="2.2" height="5.5" rx="1" fill="currentColor"/>',
 }
 function alignIcon(edge) { return `<svg viewBox="0 0 16 16" width="15" height="15">${ALIGN_ICONS[edge]}</svg>` }
+
+const SHIELD_CENTER_ICON = '<path d="M8 1.6 3.2 3.3V7.8c0 3 2.4 4.9 4.8 6 2.4-1.1 4.8-3 4.8-6V3.3z" fill="none" stroke="#e8c84a" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="7.1" r="1.7" fill="currentColor"/>'
+function shieldCenterIcon() { return `<svg viewBox="0 0 16 16" width="15" height="15">${SHIELD_CENTER_ICON}</svg>` }
 
 const distributeOps = [
   { axis: 'h', title: 'Distribute horizontal spacing' },
@@ -823,17 +852,26 @@ function stepBg(dir) {
           </div>
         </Transition>
 
-        <!-- Align toolbar — appears when 2+ alignable elements are selected -->
+        <!-- Align toolbar — shield-center at 1+ elements; align at 2+; distribute at 3+ -->
         <Transition name="align-fade">
-          <div v-if="alignableCount >= 2" class="align-bar">
+          <div v-if="alignableCount >= 1" class="align-bar">
             <button
-              v-for="op in alignOps"
-              :key="op.edge"
               class="align-btn"
-              :title="op.title"
-              @click="alignSelection(op.edge)"
-              v-html="alignIcon(op.edge)"
+              title="Center on shield"
+              @click="centerOnShield"
+              v-html="shieldCenterIcon()"
             />
+            <template v-if="alignableCount >= 2">
+              <span class="align-sep" />
+              <button
+                v-for="op in alignOps"
+                :key="op.edge"
+                class="align-btn"
+                :title="op.title"
+                @click="alignSelection(op.edge)"
+                v-html="alignIcon(op.edge)"
+              />
+            </template>
             <template v-if="alignableCount >= 3">
               <span class="align-sep" />
               <button
