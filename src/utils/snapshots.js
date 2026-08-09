@@ -59,9 +59,19 @@ export async function deleteSnapshot(id) {
 }
 
 // One-time copy of this browser's localStorage snapshots into the signed-in
-// user's account, so existing designs follow them to the cloud. Idempotent via
-// a migrated flag; local copies are kept as-is (nothing is deleted).
-export async function importLocalToCloud() {
+// user's account, so existing designs follow them to the cloud. Idempotent at
+// the DB level: each row carries `source_local_id` (the local snapshot id) with
+// a unique (owner_id, source_local_id) index, and we upsert with
+// ignoreDuplicates — so re-running (even with the flag cleared) can never
+// duplicate. The in-flight guard also stops concurrent invocations racing.
+let _importInFlight = null
+export function importLocalToCloud() {
+  if (_importInFlight) return _importInFlight
+  _importInFlight = _doImport().finally(() => { _importInFlight = null })
+  return _importInFlight
+}
+
+async function _doImport() {
   if (localStorage.getItem(MIGRATED_KEY)) return { imported: 0, alreadyDone: true }
   const uid = await currentUserId()
   if (!uid) return { imported: 0 }
@@ -70,12 +80,14 @@ export async function importLocalToCloud() {
   let imported = 0
   for (const snap of locals) {
     try {
-      await saveCloud(uid, snap.name, snap.config, snap.thumbnail ?? null)
-      imported++
+      const { error } = await supabase.from('designs').upsert(
+        { owner_id: uid, title: snap.name, config: snap.config, thumbnail_url: snap.thumbnail ?? null, source_local_id: snap.id },
+        { onConflict: 'owner_id,source_local_id', ignoreDuplicates: true },
+      )
+      if (!error) imported++
     } catch {}
   }
-  // Mark done regardless of partial failures — locals stay in localStorage as a
-  // backup, and this avoids re-importing (which would duplicate) on next login.
+  // Local copies stay in localStorage as a backup — nothing is deleted.
   localStorage.setItem(MIGRATED_KEY, '1')
   return { imported }
 }
