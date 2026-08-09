@@ -30,6 +30,12 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
               <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.
             </p>
           </div>
+
+          <p class="about-legal">
+            <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a>
+            <span aria-hidden="true">·</span>
+            <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
+          </p>
         </div>
       </div>
     </Transition>
@@ -124,6 +130,23 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
   border-bottom: 1px solid rgba(232, 200, 74, 0.35);
 }
 .about-text a:hover { border-bottom-color: #e8c84a; }
+
+.about-legal {
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid #2a2a35;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.about-legal a {
+  color: #9a9aa8;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(154, 154, 168, 0.3);
+}
+.about-legal a:hover { color: #e8c84a; border-bottom-color: #e8c84a; }
 
 .about-fade-enter-active,
 .about-fade-leave-active { transition: opacity 0.2s ease; }
