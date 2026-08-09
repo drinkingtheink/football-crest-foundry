@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
+import { embedFontsInto } from './exportBadge.js'
 
 const PREFIX = 'crest-foundry:snap:'
 const LEGACY_PREFIX = 'crest-forge:snap:'
@@ -24,7 +25,7 @@ function fromRow(row) {
 }
 
 export async function saveSnapshot(name, config, svgEl) {
-  const thumbnail = svgEl ? await captureThumb(svgEl) : null
+  const thumbnail = svgEl ? await captureThumb(svgEl, config.texts) : null
   const cleanConfig = JSON.parse(JSON.stringify(config))
   const uid = await currentUserId()
   return uid
@@ -109,9 +110,13 @@ function isQuotaError(e) {
     (e.code === 22 || e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED')
 }
 
-async function captureThumb(svgEl) {
+async function captureThumb(svgEl, texts) {
   const clone = svgEl.cloneNode(true)
   clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+  // An <img>-rendered SVG can't use the page's webfonts, so inline them as
+  // base64 @font-face (same approach as the PNG export) — otherwise thumbnail
+  // text falls back to a system font with different metrics.
+  await embedFontsInto(clone, texts)
   const svgStr = new XMLSerializer().serializeToString(clone)
   const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' })
   const url = URL.createObjectURL(blob)

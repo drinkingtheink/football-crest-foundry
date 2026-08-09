@@ -82,7 +82,7 @@ async function embedFont(family, chars) {
   } catch { return '' }
 }
 
-async function embedFontsInto(clone, texts) {
+export async function embedFontsInto(clone, texts) {
   const charsByFamily = new Map()
   for (const t of texts || []) {
     if (!t.fontFamily) continue
