@@ -91,6 +91,15 @@ function formatDate(ts) {
 
     <div v-else class="snap-grid">
       <div v-for="snap in snapshots" :key="snap.id" class="snap-card">
+        <svg
+          v-if="snap.source === 'cloud'"
+          class="snap-cloud"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          title="Synced to your account"
+        >
+          <path d="M6.5 19a4.5 4.5 0 0 1-.5-8.97 6 6 0 0 1 11.65-1.2A4 4 0 0 1 18 19z" fill="currentColor" />
+        </svg>
         <button class="snap-thumb-btn" @click="handleLoad(snap)" :title="`Load: ${snap.name}`">
           <img v-if="snap.thumbnail" :src="snap.thumbnail" class="snap-thumb" />
           <div v-else class="snap-thumb-placeholder" />
@@ -140,6 +149,7 @@ function formatDate(ts) {
 }
 
 .snap-card {
+  position: relative;
   background: #1e1e28;
   border: 1px solid #2a2a35;
   border-radius: 7px;
@@ -147,6 +157,21 @@ function formatDate(ts) {
   transition: border-color 0.15s;
 }
 .snap-card:hover { border-color: #555; }
+
+/* Quiet hint that this snapshot lives in the account (cloud) rather than
+   this browser's localStorage — deliberately understated. */
+.snap-cloud {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 13px;
+  height: 13px;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.45);
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7));
+  pointer-events: none;
+}
+.snap-card:hover .snap-cloud { color: rgba(232, 200, 74, 0.7); }
 
 .snap-thumb-btn {
   display: block;

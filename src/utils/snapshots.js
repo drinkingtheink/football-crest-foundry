@@ -22,6 +22,7 @@ function fromRow(row) {
     timestamp: new Date(row.updated_at ?? row.created_at).getTime(),
     config: row.config,
     thumbnail: row.thumbnail_url ?? null,
+    source: 'cloud',
   }
 }
 
@@ -95,7 +96,7 @@ async function saveCloud(uid, name, config, thumbnail) {
 
 function saveLocal(name, config, thumbnail) {
   const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-  const entry = { id, name, timestamp: Date.now(), config, thumbnail }
+  const entry = { id, name, timestamp: Date.now(), config, thumbnail, source: 'local' }
   try {
     localStorage.setItem(PREFIX + id, JSON.stringify(entry))
   } catch (e) {
