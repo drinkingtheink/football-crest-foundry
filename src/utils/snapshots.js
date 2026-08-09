@@ -120,19 +120,72 @@ function makeShareToken() {
 }
 
 // Ensure a cloud design has a share link and is shared. Reuses an existing
-// token so the URL is stable across shares. Returns { token, url }.
+// token so the URL is stable across shares. Also (re)generates a social-preview
+// (OG) image from the design's thumbnail and uploads it to public storage.
+// Returns { token, url }.
 export async function shareDesign(id) {
-  const { data: existing, error: e1 } = await supabase
-    .from('designs').select('share_token').eq('id', id).single()
+  const { data: row, error: e1 } = await supabase
+    .from('designs').select('share_token, thumbnail_url, config').eq('id', id).single()
   if (e1) throw e1
 
-  const token = existing?.share_token || makeShareToken()
-  const { error } = await supabase
-    .from('designs')
-    .update({ share_token: token, is_shared: true, shared_at: new Date().toISOString() })
-    .eq('id', id)
+  const token = row?.share_token || makeShareToken()
+
+  // Best-effort OG image — sharing still succeeds if this fails.
+  let ogImageUrl = null
+  try {
+    const blob = await makeOgImage(row?.thumbnail_url, row?.config?.palette || [])
+    if (blob) {
+      const path = `${id}.png`
+      const { error: upErr } = await supabase.storage
+        .from('og-images')
+        .upload(path, blob, { upsert: true, contentType: 'image/png', cacheControl: '3600' })
+      if (!upErr) ogImageUrl = supabase.storage.from('og-images').getPublicUrl(path).data.publicUrl
+    }
+  } catch { /* leave ogImageUrl null */ }
+
+  const patch = { share_token: token, is_shared: true, shared_at: new Date().toISOString() }
+  if (ogImageUrl) patch.og_image_url = ogImageUrl
+  const { error } = await supabase.from('designs').update(patch).eq('id', id)
   if (error) throw error
   return { token, url: `${location.origin}/?c=${token}` }
+}
+
+// Composite the crest thumbnail onto a 1200×630 palette-tinted canvas — the
+// standard social-card size. Returns a PNG Blob (or null if no thumbnail).
+async function makeOgImage(thumbDataUrl, palette) {
+  if (!thumbDataUrl) return null
+  const W = 1200, H = 630
+  const canvas = document.createElement('canvas')
+  canvas.width = W
+  canvas.height = H
+  const ctx = canvas.getContext('2d')
+
+  const c0 = palette[0] || '#13131a'
+  const c1 = palette[1] || palette[0] || '#07070e'
+  const grad = ctx.createLinearGradient(0, 0, 0, H)
+  grad.addColorStop(0, c0)
+  grad.addColorStop(1, c1)
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, W, H)
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'   // darken for crest contrast
+  ctx.fillRect(0, 0, W, H)
+
+  const img = await loadImageEl(thumbDataUrl)
+  const scale = (H * 0.82) / img.height
+  const dw = img.width * scale
+  const dh = img.height * scale
+  ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh)
+
+  return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+}
+
+function loadImageEl(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
 }
 
 export async function unshareDesign(id) {
