@@ -12,11 +12,12 @@ const props = defineProps({
 const { config } = useBadgeConfig()
 
 const imageMap = {
-  grass:   '/backgrounds/grass.jpg',
-  fabric:  '/backgrounds/fabric.png',
-  brick:   '/backgrounds/brick.jpg',
-  stadium: '/backgrounds/stadium.jpg',
-  pitch:   '/backgrounds/pitch.png',
+  grass:     '/backgrounds/grass.jpg',
+  fabric:    '/backgrounds/fabric.png',
+  brick:     '/backgrounds/brick.jpg',
+  stadium:   '/backgrounds/stadium.jpg',
+  pitch:     '/backgrounds/pitch.png',
+  stone:     '/backgrounds/stone.jpg',
 }
 
 // Per-image focal anchor for `cover` cropping. The stadium photo is 4:3 with the
