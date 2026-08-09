@@ -1641,6 +1641,23 @@ function stepBg(dir) {
   position: relative;
 }
 
+/* On short screens the vertically-centred stack squeezes the scene / background
+   controls against the bottom edge. Top-align and trim spacing so the crest
+   rides up and leaves room for the background options below it. */
+@media (max-height: 860px) {
+  .preview-pane {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 28px 40px 20px;
+  }
+}
+@media (max-height: 740px) {
+  .preview-pane {
+    gap: 8px;
+    padding: 16px 40px 14px;
+  }
+}
+
 .particle-canvas {
   position: absolute;
   inset: 0;
