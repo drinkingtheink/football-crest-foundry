@@ -306,6 +306,20 @@ const MANIFEST = [
   { file: 'delapouite/polar-star.svg',       id: 'gi-polar-star',      label: 'Polar Star',      group: 'Celestial' },
   { file: 'delapouite/seven-pointed-star.svg', id: 'gi-seven-star',    label: 'Seven-Point Star',group: 'Celestial' },
   { file: 'delapouite/striped-sun.svg',      id: 'gi-striped-sun',     label: 'Striped Sun',     group: 'Celestial' },
+
+  // ══ Batch 8 — Mascot animals (aggressive team-name creatures) ══════════════
+  { file: 'delapouite/lynx-head.svg',            id: 'gi-lynx',       label: 'Lynx',        group: 'Beasts' },
+  { file: 'delapouite/bison.svg',                id: 'gi-bison',      label: 'Bison',       group: 'Beasts' },
+  { file: 'delapouite/buffalo-head.svg',         id: 'gi-buffalo',    label: 'Buffalo',     group: 'Beasts' },
+  { file: 'delapouite/gorilla.svg',              id: 'gi-gorilla',    label: 'Gorilla',     group: 'Beasts' },
+  { file: 'delapouite/rhinoceros-horn.svg',      id: 'gi-rhino',      label: 'Rhino',       group: 'Beasts' },
+  { file: 'delapouite/saber-toothed-cat-head.svg', id: 'gi-sabertooth', label: 'Sabertooth', group: 'Beasts' },
+  { file: 'lorc/direwolf.svg',                   id: 'gi-direwolf',   label: 'Direwolf',    group: 'Beasts' },
+  { file: 'lorc/werewolf.svg',                   id: 'gi-werewolf',   label: 'Werewolf',    group: 'Beasts' },
+  { file: 'lorc/bull-horns.svg',                 id: 'gi-bull-horns', label: 'Bull Horns',  group: 'Beasts' },
+  { file: 'lorc/bee.svg',                        id: 'gi-bee',        label: 'Bee',         group: 'Insects' },
+  { file: 'lorc/angular-spider.svg',             id: 'gi-spider',     label: 'Spider',      group: 'Insects' },
+  { file: 'lorc/wasp-sting.svg',                 id: 'gi-wasp',       label: 'Wasp',        group: 'Insects' },
 ]
 
 function ensureRepo() {
