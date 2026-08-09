@@ -1030,9 +1030,14 @@ function stepBg(dir) {
           </div>
           <div class="logo-actions">
             <button class="about-btn" title="About &amp; credits" @click="showAbout = true">ⓘ</button>
-            <button class="randomize-btn" title="Forge a new crest" @click="randomizeAll">⚡</button>
           </div>
         </div>
+
+        <div class="forge-block">
+        <button class="randomize-btn" title="Forge a new crest" @click="randomizeAll">
+          <svg class="randomize-bolt" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z" fill="var(--accent-warm)"/></svg>
+          <span class="randomize-label">Forge Random Crest</span>
+        </button>
 
         <!-- Shield / No Shield mode -->
         <div class="mode-switch" role="group" aria-label="Shield mode">
@@ -1046,6 +1051,7 @@ function stepBg(dir) {
             :class="{ active: config.noShield }"
             @click="setNoShield(true)"
           >No Shield</button>
+        </div>
         </div>
 
         <!-- Club Colors / Palette -->
@@ -1534,25 +1540,89 @@ function stepBg(dir) {
   gap: 6px;
 }
 
-.randomize-btn,
 .about-btn {
   background: none;
   border: 1px solid #3a3a4a;
   border-radius: 6px;
   color: #888;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1;
   padding: 3px 7px;
   transition: border-color 0.15s, color 0.15s;
 }
-.randomize-btn:hover,
 .about-btn:hover {
   border-color: #e8c84a;
   color: #e8c84a;
 }
 
-.about-btn { font-size: 15px; }
+.forge-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.randomize-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background:
+    linear-gradient(180deg, rgba(232, 200, 74, 0.14), rgba(232, 200, 74, 0.05)),
+    #16161d;
+  border: 1px solid rgba(232, 200, 74, 0.4);
+  border-radius: 8px;
+  color: #f3dd82;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.06s;
+}
+.randomize-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 240, 200, 0.35), transparent);
+  transform: skewX(-18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+.randomize-btn:hover {
+  border-color: #e8c84a;
+  color: #fff2c4;
+  box-shadow: 0 0 16px rgba(232, 200, 74, 0.28), inset 0 0 12px rgba(232, 200, 74, 0.1);
+}
+.randomize-btn:hover::before {
+  animation: forge-sheen 0.7s ease-out;
+}
+.randomize-btn:active { transform: translateY(1px); }
+.randomize-btn:hover .randomize-bolt {
+  transform: rotate(-12deg) scale(1.15);
+  filter: drop-shadow(0 0 7px var(--accent-warm-glow));
+}
+.randomize-bolt {
+  display: inline-block;
+  filter: drop-shadow(0 0 4px var(--accent-warm-soft));
+  transition: transform 0.2s, filter 0.2s;
+}
+@keyframes forge-sheen {
+  0%   { opacity: 0; left: -60%; }
+  15%  { opacity: 1; }
+  100% { opacity: 0; left: 130%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .randomize-btn::before { display: none; }
+  .randomize-bolt { transition: none; }
+}
 
 .preview-pane {
   flex: 1;
