@@ -453,4 +453,45 @@ const showRectTile = computed(() => {
 .icon-btn:hover .cs-del { opacity: 1; }
 .cs-del:hover { color: #fff; background: #e05555; }
 
+.my-add { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.my-add-row { display: flex; gap: 8px; align-items: center; }
+.my-add-row .my-input { flex: 1; }
+.my-preview {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #2a2a35;
+  border-radius: 6px;
+  background: #1e1e28;
+  color: #cdb96a;
+}
+.my-preview.err { border-color: rgba(224, 85, 85, 0.5); color: #e05555; }
+.my-preview-ph { color: #555; font-size: 16px; }
+.my-err { margin: 0; font-size: 11px; color: #e05555; }
+.my-add-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+.cs-edit {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 15px;
+  height: 15px;
+  border-radius: 8px;
+  background: #2a2a35;
+  border: 1px solid #13131a;
+  color: #888;
+  font-size: 9px;
+  line-height: 13px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+  z-index: 12;
+}
+.icon-btn:hover .cs-edit { opacity: 1; }
+.cs-edit:hover { color: #111; background: var(--accent-warm); }
+
 </style>
