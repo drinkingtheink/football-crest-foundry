@@ -55,6 +55,7 @@ const {
   setBorderColor,
   setBorderWidth,
   addSymbol,
+  addCustomSymbol,
   addRect,
   removeSymbol,
   updateSymbol,
@@ -372,14 +373,16 @@ function onPickIcon(iconId) {
   }
 }
 
+function onAddCustom(cs) { addCustomSymbol(cs) }   // { id, label, paths, viewBox }
+
 // Placed-symbols thumbnail: use the icon's own viewBox, and scale strokeWidth
 // (authored in 100-unit space) to it so the preview matches the badge.
-function symPreviewVB(iconId) {
-  const vb = iconsById[iconId]?.viewBox
+function symPreviewVB(sym) {
+  const vb = sym.customViewBox || iconsById[sym.iconId]?.viewBox
   return vb ? `0 0 ${vb[0]} ${vb[1]}` : '0 0 100 100'
 }
 function symPreviewStroke(sym) {
-  const vb = iconsById[sym.iconId]?.viewBox ?? [100, 100]
+  const vb = sym.customViewBox ?? iconsById[sym.iconId]?.viewBox ?? [100, 100]
   return sym.strokeWidth * Math.max(vb[0], vb[1]) / 100
 }
 // Scale a rectangle's w/h to fit the ~30px sidebar preview, keeping its ratio.
@@ -1523,7 +1526,7 @@ function stepBg(dir) {
         <!-- Symbol Gallery -->
         <div class="control-group">
           <h3 class="control-label">Add Symbol</h3>
-          <IconPicker :placed-counts="placedIconCounts" :selected-icon-id="selectedIconId" @add-icon="onPickIcon" />
+          <IconPicker :placed-counts="placedIconCounts" :selected-icon-id="selectedIconId" @add-icon="onPickIcon" @add-custom="onAddCustom" />
         </div>
 
         <!-- Placed Symbols -->
@@ -1551,9 +1554,9 @@ function stepBg(dir) {
                     paint-order="stroke fill"
                   />
                 </svg>
-                <svg v-else :viewBox="symPreviewVB(sym.iconId)" width="28" height="28" class="sym-preview">
+                <svg v-else :viewBox="symPreviewVB(sym)" width="28" height="28" class="sym-preview">
                   <path
-                    v-for="(p, i) in iconsById[sym.iconId]?.paths"
+                    v-for="(p, i) in (sym.customPaths || iconsById[sym.iconId]?.paths)"
                     :key="i"
                     :d="p"
                     :fill="sym.color"
@@ -1563,7 +1566,7 @@ function stepBg(dir) {
                   />
                 </svg>
 
-                <span class="sym-label">{{ sym.kind === 'rect' ? 'Rectangle' : iconsById[sym.iconId]?.label }}</span>
+                <span class="sym-label">{{ sym.kind === 'rect' ? 'Rectangle' : (sym.customLabel || iconsById[sym.iconId]?.label) }}</span>
 
                 <div class="sym-controls">
                   <ColorPicker

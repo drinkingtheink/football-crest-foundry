@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
 import { icons, iconGroups, iconCats } from '../data/icons.js'
+import { useCustomSymbols } from '../composables/useCustomSymbols.js'
+import { useToast } from '../composables/useToast.js'
 
 const props = defineProps({
   // { [iconId]: count } — how many of each symbol are currently in the design
@@ -8,10 +10,43 @@ const props = defineProps({
   // Gallery id of the selected canvas symbol; when set, scroll it into view
   selectedIconId: { type: String, default: null },
 })
-const emit = defineEmits(['add-icon'])
+const emit = defineEmits(['add-icon', 'add-custom'])
 
 const search = ref('')
 const activeGroup = ref('All')
+const tabs = [...iconGroups, 'My Symbols']
+
+// ── My Symbols (user-uploaded, single-fill, one-colour, local) ──────────────
+const { customSymbols, addFromSvg, remove } = useCustomSymbols()
+const { addToast } = useToast()
+const fileInput = ref(null)
+const pasteOpen = ref(false)
+const pasteText = ref('')
+const pasteLabel = ref('')
+
+function onFile(e) {
+  const file = e.target.files?.[0]
+  e.target.value = ''
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => importSvg(String(reader.result), file.name.replace(/\.svg$/i, ''))
+  reader.onerror = () => addToast('Couldn’t read that file.', { type: 'error' })
+  reader.readAsText(file)
+}
+
+function importSvg(text, label) {
+  const res = addFromSvg(text, label)
+  if (res?.error) { addToast(res.error, { type: 'error', duration: 4500 }); return }
+  addToast('Added to My Symbols', { type: 'success', duration: 2500 })
+  pasteOpen.value = false
+  pasteText.value = ''
+  pasteLabel.value = ''
+}
+
+function importPaste() {
+  if (!pasteText.value.trim()) return
+  importSvg(pasteText.value, pasteLabel.value)
+}
 
 // Button refs keyed by gallery id, so a selected symbol can be revealed here.
 const btnRefs = {}
@@ -71,16 +106,47 @@ const showRectTile = computed(() => {
 
     <div class="group-tabs">
       <button
-        v-for="g in iconGroups"
+        v-for="g in tabs"
         :key="g"
         class="group-tab"
-        :class="{ active: activeGroup === g }"
+        :class="{ active: activeGroup === g, 'is-mine': g === 'My Symbols' }"
         @click="activeGroup = g"
       >{{ g }}</button>
     </div>
 
-    <!-- Scroll wrapper separate from flex grid so tooltips aren't clipped -->
-    <div class="icon-grid-scroll">
+    <!-- My Symbols: flat list of user-uploaded one-colour SVGs (no categories) -->
+    <div v-if="activeGroup === 'My Symbols'" class="icon-grid-scroll">
+      <div class="my-tools">
+        <button class="my-btn" @click="fileInput.click()">⬆ Upload SVG</button>
+        <button class="my-btn ghost" @click="pasteOpen = !pasteOpen">{{ pasteOpen ? 'Close' : 'Paste markup' }}</button>
+        <input ref="fileInput" type="file" accept=".svg,image/svg+xml" hidden @change="onFile" />
+      </div>
+      <div v-if="pasteOpen" class="my-paste">
+        <input v-model="pasteLabel" class="my-input" placeholder="Name (optional)" />
+        <textarea v-model="pasteText" class="my-textarea" rows="4" placeholder="Paste <svg>…</svg> markup"></textarea>
+        <button class="my-btn" :disabled="!pasteText.trim()" @click="importPaste">Add symbol</button>
+      </div>
+      <p class="my-hint">Simple, one-colour SVGs only — colour is applied on the crest.</p>
+      <div v-if="customSymbols.length" class="icon-grid">
+        <button
+          v-for="cs in customSymbols"
+          :key="cs.id"
+          class="icon-btn"
+          @click="emit('add-custom', cs)"
+          @mouseenter="showTip($event, cs.label)"
+          @mouseleave="hideTip"
+        >
+          <svg :viewBox="`0 0 ${cs.viewBox[0]} ${cs.viewBox[1]}`" width="34" height="34">
+            <path v-for="(p, i) in cs.paths" :key="i" :d="p" fill="currentColor" />
+          </svg>
+          <span class="cs-del" title="Delete symbol" @click.stop="remove(cs.id)">✕</span>
+        </button>
+      </div>
+      <p v-else class="my-empty">No custom symbols yet.</p>
+    </div>
+
+    <!-- Built-in gallery -->
+    <div v-else class="icon-grid-scroll">
       <div class="icon-grid">
         <button
           v-if="showRectTile"
@@ -274,5 +340,63 @@ const showRectTile = computed(() => {
   font-family: system-ui, sans-serif;
   z-index: 11;
 }
+
+/* ── My Symbols ── */
+.group-tab.is-mine { color: #cdb96a; }
+.group-tab.is-mine.active { color: #e8c84a; border-color: #e8c84a; }
+
+.my-tools { display: flex; gap: 6px; margin-bottom: 8px; }
+.my-btn {
+  background: #1e1e28;
+  border: 1px solid #3a3a4a;
+  border-radius: 5px;
+  color: #cdb96a;
+  font-size: 11px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.my-btn:hover:not(:disabled) { border-color: var(--accent-warm); color: var(--accent-warm); }
+.my-btn:disabled { opacity: 0.5; cursor: default; }
+.my-btn.ghost { color: #888; }
+
+.my-paste { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.my-input, .my-textarea {
+  background: #1e1e28;
+  border: 1px solid #2a2a35;
+  border-radius: 5px;
+  color: #e8e8ec;
+  font-size: 12px;
+  padding: 6px 8px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.my-input:focus, .my-textarea:focus { border-color: #555; }
+.my-textarea { font-family: ui-monospace, Menlo, monospace; resize: vertical; }
+
+.my-hint { margin: 0 0 8px; font-size: 10px; color: #666; }
+.my-empty { font-size: 11px; color: #555; text-align: center; margin: 10px 0; }
+
+.cs-del {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  border-radius: 8px;
+  background: #2a2a35;
+  border: 1px solid #13131a;
+  color: #888;
+  font-size: 9px;
+  line-height: 13px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+  z-index: 12;
+}
+.icon-btn:hover .cs-del { opacity: 1; }
+.cs-del:hover { color: #fff; background: #e05555; }
 
 </style>

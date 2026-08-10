@@ -366,6 +366,7 @@ export function useBadgeConfig() {
     setBorderColor,
     setBorderWidth,
     addSymbol,
+    addCustomSymbol,
     addRect,
     removeSymbol,
     updateSymbol,
