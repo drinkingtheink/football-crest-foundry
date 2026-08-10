@@ -127,23 +127,28 @@ export function startAnimatedFavicon() {
     link.href = canvas.toDataURL('image/png')
   }
 
-  // Reduced motion: paint one resting frame (crest lit, hammer down) and stop.
-  if (reduce?.matches) { render(0.5); return }
+  // Resting frame: crest lit, hammer down — shown whenever the tab is active.
+  const REST = 0.5
 
-  let raf = 0
-  let last = -Infinity
-  const frameMs = 1000 / FPS
-  const tick = now => {
-    raf = requestAnimationFrame(tick)
-    if (document.hidden) return
-    if (now - last < frameMs) return
-    last = now
-    render((now % LOOP) / LOOP)
+  // Reduced motion: paint the resting frame once and never animate.
+  if (reduce?.matches) { render(REST); return }
+
+  // The forge only animates while the tab is in the BACKGROUND (user is elsewhere).
+  // Backgrounded tabs pause requestAnimationFrame, so drive it with setInterval,
+  // timed off the wall clock — browsers clamp hidden-tab timers to ~1s, giving a
+  // slow, deliberate forge. Foreground shows a single static resting frame.
+  let timer = 0
+  const stop = () => { if (timer) { clearInterval(timer); timer = 0 } }
+  const animate = () => {
+    if (timer) return
+    render((performance.now() % LOOP) / LOOP)
+    timer = setInterval(() => render((performance.now() % LOOP) / LOOP), 1000 / FPS)
   }
-  raf = requestAnimationFrame(tick)
 
-  // Repaint immediately on tab focus so a backgrounded tab shows a fresh frame.
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) last = -Infinity
-  })
+  const sync = () => {
+    if (document.hidden) animate()
+    else { stop(); render(REST) }
+  }
+  document.addEventListener('visibilitychange', sync)
+  sync()
 }

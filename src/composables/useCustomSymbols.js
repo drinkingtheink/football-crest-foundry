@@ -52,5 +52,12 @@ export function useCustomSymbols() {
     persist()
   }
 
-  return { customSymbols, addFromSvg, remove }
+  function rename(id, label) {
+    const name = (label || '').trim()
+    if (!name) return
+    customSymbols.value = customSymbols.value.map(s => s.id === id ? { ...s, label: name } : s)
+    persist()
+  }
+
+  return { customSymbols, addFromSvg, remove, rename }
 }
