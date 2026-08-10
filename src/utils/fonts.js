@@ -159,6 +159,33 @@ export const fonts = [
   { family: 'Luckiest Guy',     group: 'Display' },
   { family: 'Shrikhand',        group: 'Display' },
   { family: 'Rammetto One',     group: 'Display' },
+
+  // ── Expanded batch 3 (all verified on Google Fonts + Fontsource for outlining) ──
+  // Classic Serif
+  { family: 'Playfair Display SC', group: 'Classic Serif' },
+  { family: 'Bodoni Moda',         group: 'Classic Serif' },
+  { family: 'Fraunces',            group: 'Classic Serif' },
+  { family: 'Sorts Mill Goudy',    group: 'Classic Serif' },
+  { family: 'Cormorant SC',        group: 'Classic Serif' },
+  { family: 'Marcellus SC',        group: 'Classic Serif' },
+  { family: 'IM Fell English SC',  group: 'Classic Serif' },
+  { family: 'Caudex',              group: 'Classic Serif' },
+  // Gothic / condensed
+  { family: 'Archivo Narrow',        group: 'Gothic' },
+  { family: 'PT Sans Narrow',        group: 'Gothic' },
+  { family: 'Dosis',                 group: 'Gothic' },
+  { family: 'Barlow Semi Condensed', group: 'Gothic' },
+  // Script (formal calligraphy — not casual handwriting)
+  { family: 'Pinyon Script',        group: 'Script' },
+  { family: 'Italianno',            group: 'Script' },
+  { family: 'Petit Formal Script',  group: 'Script' },
+  // Display / Athletic
+  { family: 'Paytone One',  group: 'Display' },
+  { family: 'Concert One',  group: 'Display' },
+  { family: 'Rozha One',    group: 'Display' },
+  { family: 'Coustard',     group: 'Display' },
+  // Modern Geometric
+  { family: 'Nova Square',  group: 'Modern' },
 ]
 
 export const fontsByGroup = Object.fromEntries(
