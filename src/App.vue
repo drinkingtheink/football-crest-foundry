@@ -3,6 +3,7 @@ import { computed, ref, reactive, watch, nextTick, onMounted, onUnmounted } from
 import BadgeComposer from './components/BadgeComposer.vue'
 import LogoMark from './components/LogoMark.vue'
 import IconPicker from './components/IconPicker.vue'
+import MySymbols from './components/MySymbols.vue'
 import TextEditor from './components/TextEditor.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import ColorPicker from './components/ColorPicker.vue'
@@ -1526,7 +1527,13 @@ function stepBg(dir) {
         <!-- Symbol Gallery -->
         <div class="control-group">
           <h3 class="control-label">Add Symbol</h3>
-          <IconPicker :placed-counts="placedIconCounts" :selected-icon-id="selectedIconId" @add-icon="onPickIcon" @add-custom="onAddCustom" />
+          <IconPicker :placed-counts="placedIconCounts" :selected-icon-id="selectedIconId" @add-icon="onPickIcon" />
+        </div>
+
+        <!-- Custom (user-uploaded) symbols — own browse menu, flat list -->
+        <div class="control-group">
+          <h3 class="control-label">My Symbols</h3>
+          <MySymbols @add-custom="onAddCustom" />
         </div>
 
         <!-- Placed Symbols -->
