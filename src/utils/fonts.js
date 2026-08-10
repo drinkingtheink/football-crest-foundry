@@ -197,7 +197,7 @@ export const fontsByGroup = Object.fromEntries(
 export const randomFonts = fonts
 
 // These are pre-loaded via <link> in index.html; mark them to skip the dynamic inject
-const loaded = new Set(['EB Garamond', 'Cormorant Garamond', 'Yeseva One'])
+const loaded = new Set(['EB Garamond', 'Cormorant Garamond', 'Nova Square', 'Yeseva One'])
 
 export function loadFont(family) {
   if (loaded.has(family)) return Promise.resolve()
