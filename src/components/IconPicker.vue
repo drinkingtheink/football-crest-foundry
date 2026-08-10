@@ -1,9 +1,6 @@
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
 import { icons, iconGroups, iconCats } from '../data/icons.js'
-import { useCustomSymbols } from '../composables/useCustomSymbols.js'
-import { useToast } from '../composables/useToast.js'
-import { svgToSymbol } from '../utils/svgImport.js'
 
 const props = defineProps({
   // { [iconId]: count } — how many of each symbol are currently in the design
@@ -11,74 +8,10 @@ const props = defineProps({
   // Gallery id of the selected canvas symbol; when set, scroll it into view
   selectedIconId: { type: String, default: null },
 })
-const emit = defineEmits(['add-icon', 'add-custom'])
+const emit = defineEmits(["add-icon"])
 
 const search = ref('')
 const activeGroup = ref('All')
-const tabs = [...iconGroups, 'My Symbols']
-
-// ── My Symbols (user-uploaded, single-fill, one-colour, local) ──────────────
-const { customSymbols, addFromSvg, remove, rename } = useCustomSymbols()
-const { addToast } = useToast()
-const fileInput = ref(null)
-
-// Shared add form (upload or paste): stage the SVG + name, preview live, commit.
-const adding = ref(false)
-const showPaste = ref(false)
-const svgText = ref('')
-const symName = ref('')
-
-// Live validation/preview — { paths, viewBox } | { error } | null.
-const preview = computed(() => {
-  const t = svgText.value.trim()
-  return t ? svgToSymbol(t) : null
-})
-
-function startUpload() { fileInput.value?.click() }
-
-function onFile(e) {
-  const file = e.target.files?.[0]
-  e.target.value = ''
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = () => {
-    svgText.value = String(reader.result)
-    symName.value = file.name.replace(/\.svg$/i, '')
-    showPaste.value = false
-    adding.value = true
-  }
-  reader.onerror = () => addToast('Couldn’t read that file.', { type: 'error' })
-  reader.readAsText(file)
-}
-
-function startPaste() {
-  svgText.value = ''
-  symName.value = ''
-  showPaste.value = true
-  adding.value = true
-}
-
-function cancelAdd() {
-  adding.value = false
-  showPaste.value = false
-  svgText.value = ''
-  symName.value = ''
-}
-
-function commitAdd() {
-  const name = symName.value.trim()
-  if (!name || !preview.value?.paths) return
-  const res = addFromSvg(svgText.value, name)
-  if (res?.error) { addToast(res.error, { type: 'error', duration: 4500 }); return }
-  addToast('Added to My Symbols', { type: 'success', duration: 2500 })
-  cancelAdd()
-}
-
-function renameSymbol(cs) {
-  const next = window.prompt('Rename symbol', cs.label)
-  if (next != null) rename(cs.id, next)
-}
-
 // Button refs keyed by gallery id, so a selected symbol can be revealed here.
 const btnRefs = {}
 function setBtnRef(el, id) { if (el) btnRefs[id] = el; else delete btnRefs[id] }
@@ -137,70 +70,16 @@ const showRectTile = computed(() => {
 
     <div class="group-tabs">
       <button
-        v-for="g in tabs"
+        v-for="g in iconGroups"
         :key="g"
         class="group-tab"
-        :class="{ active: activeGroup === g, 'is-mine': g === 'My Symbols' }"
+        :class="{ active: activeGroup === g }"
         @click="activeGroup = g"
       >{{ g }}</button>
     </div>
 
-    <!-- My Symbols: flat list of user-uploaded one-colour SVGs (no categories) -->
-    <div v-if="activeGroup === 'My Symbols'" class="icon-grid-scroll">
-      <input ref="fileInput" type="file" accept=".svg,image/svg+xml" hidden @change="onFile" />
-
-      <div v-if="!adding" class="my-tools">
-        <button class="my-btn" @click="startUpload">⬆ Upload SVG</button>
-        <button class="my-btn ghost" @click="startPaste">Paste markup</button>
-      </div>
-
-      <div v-else class="my-add">
-        <textarea
-          v-if="showPaste"
-          v-model="svgText"
-          class="my-textarea"
-          rows="4"
-          placeholder="Paste <svg>…</svg> markup"
-        ></textarea>
-        <div class="my-add-row">
-          <div class="my-preview" :class="{ err: preview && preview.error }">
-            <svg v-if="preview && preview.paths" :viewBox="`0 0 ${preview.viewBox[0]} ${preview.viewBox[1]}`" width="30" height="30">
-              <path v-for="(p, i) in preview.paths" :key="i" :d="p" fill="currentColor" />
-            </svg>
-            <span v-else class="my-preview-ph">?</span>
-          </div>
-          <input v-model="symName" class="my-input" placeholder="Name" @keydown.enter="commitAdd" />
-        </div>
-        <p v-if="preview && preview.error" class="my-err">{{ preview.error }}</p>
-        <div class="my-add-actions">
-          <button class="my-btn ghost" @click="cancelAdd">Cancel</button>
-          <button class="my-btn" :disabled="!symName.trim() || !(preview && preview.paths)" @click="commitAdd">Add symbol</button>
-        </div>
-      </div>
-
-      <p class="my-hint">Simple, one-colour SVGs only — colour is applied on the crest.</p>
-
-      <div v-if="customSymbols.length" class="icon-grid">
-        <button
-          v-for="cs in customSymbols"
-          :key="cs.id"
-          class="icon-btn"
-          @click="emit('add-custom', cs)"
-          @mouseenter="showTip($event, cs.label)"
-          @mouseleave="hideTip"
-        >
-          <svg :viewBox="`0 0 ${cs.viewBox[0]} ${cs.viewBox[1]}`" width="34" height="34">
-            <path v-for="(p, i) in cs.paths" :key="i" :d="p" fill="currentColor" />
-          </svg>
-          <span class="cs-edit" title="Rename" @click.stop="renameSymbol(cs)">✎</span>
-          <span class="cs-del" title="Delete symbol" @click.stop="remove(cs.id)">✕</span>
-        </button>
-      </div>
-      <p v-else class="my-empty">No custom symbols yet.</p>
-    </div>
-
-    <!-- Built-in gallery -->
-    <div v-else class="icon-grid-scroll">
+    <!-- Scroll wrapper separate from flex grid so tooltips aren't clipped -->
+    <div class="icon-grid-scroll">
       <div class="icon-grid">
         <button
           v-if="showRectTile"
