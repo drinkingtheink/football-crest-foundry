@@ -201,6 +201,20 @@ export function useBadgeConfig() {
     setSelection('symbol', instanceId)
   }
 
+  // A user-uploaded symbol. Its geometry is embedded on the instance (customPaths
+  // /customViewBox) so the crest stays self-contained across save/load/share.
+  function addCustomSymbol(def) {
+    const instanceId = `sym-${nextId++}`
+    const color = config.palette[Math.floor(Math.random() * config.palette.length)] || '#ffffff'
+    const strokeColor = _contrastColor(color, config.palette)
+    config.symbols.push({
+      instanceId, iconId: def.id, color, x: 100, y: 105, size: 72, rotation: 0, flipH: false,
+      strokeColor, strokeWidth: 0, clipped: true,
+      customPaths: def.paths, customViewBox: def.viewBox, customLabel: def.label,
+    })
+    setSelection('symbol', instanceId)
+  }
+
   // A rectangle primitive — a symbol with kind 'rect' and independent w/h
   // (no icon/size). Reuses all the symbol placement/selection/align machinery.
   function addRect() {
@@ -310,7 +324,8 @@ export function useBadgeConfig() {
     // A saved crest may reference an icon that no longer exists (removed/renamed)
     // — swap it for a random one so the symbol still shows. Rects have no icon.
     const validSymbols = saved.symbols.map(s => {
-      if (s.kind === 'rect' || _iconIdSet.has(s.iconId)) return s
+      // Rects, custom (self-contained geometry), and known icons pass through.
+      if (s.kind === 'rect' || s.customPaths || _iconIdSet.has(s.iconId)) return s
       return { ...s, iconId: icons[Math.floor(Math.random() * icons.length)].id }
     })
     config.symbols.splice(0, config.symbols.length, ...validSymbols)

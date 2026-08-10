@@ -1680,6 +1680,7 @@ function stepBg(dir) {
             :save-fn="doSaveSnapshot"
             :update-fn="doUpdateSnapshot"
             :active-design="activeDesign"
+            :texts="config.texts"
             @load="onLoadSnapshot"
             @deleted="onSnapshotDeleted"
             @share="doShareDesign"

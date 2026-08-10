@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { listSnapshots, deleteSnapshot, clearCloudDesigns } from '../utils/snapshots.js'
+import { deriveCrestName } from '../utils/crestName.js'
 import { useToast } from '../composables/useToast.js'
 import SaveModal from './SaveModal.vue'
 
@@ -8,6 +9,7 @@ const props = defineProps({
   saveFn: { type: Function, required: true },
   updateFn: { type: Function, default: null },
   activeDesign: { type: Object, default: null },
+  texts: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['load', 'deleted', 'share'])
 
@@ -44,7 +46,10 @@ onMounted(refresh)
 
 function startSave(opts) {
   saveForShare.value = !!opts?.share
-  defaultName.value = props.activeDesign?.name || `Design ${new Date().toLocaleDateString()}`
+  const stamp = new Date().toLocaleDateString()
+  const derived = deriveCrestName(props.texts)
+  defaultName.value = props.activeDesign?.name
+    || (derived ? `${derived} · ${stamp}` : `Design ${stamp}`)
   showSaveModal.value = true
 }
 

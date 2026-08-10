@@ -129,14 +129,14 @@ function symPaths(sym) {
 // (e.g. 512) and thick on small ones (100). Author strokeWidth in 100-unit space
 // and scale it to the icon's viewBox here, so on-badge thickness stays consistent.
 function symbolStroke(sym) {
-  const icon = iconsById[sym.iconId]
+  const icon = iconFor(sym)
   const vw = icon?.viewBox?.[0] ?? 100
   const vh = icon?.viewBox?.[1] ?? 100
   return sym.strokeWidth * Math.max(vw, vh) / 100
 }
 
 function symbolTransform(sym) {
-  const icon = iconsById[sym.iconId]
+  const icon = iconFor(sym)
   const vw = icon?.viewBox?.[0] ?? 100
   const vh = icon?.viewBox?.[1] ?? 100
   const scale = sym.size / Math.max(vw, vh)
