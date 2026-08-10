@@ -3,20 +3,25 @@
 // swings a 3-strike loop, each impact shuddering the crest, flaring the spark
 // burst and spitting embers, then the mark rests aglow before repeating.
 // Pure CSS — no JS, no SMIL — and fully stilled under prefers-reduced-motion.
+import { useId } from 'vue'
+// Unique per instance — several LogoMarks share the page (header, mobile gate,
+// About, shared view); a hard-coded gradient id collides and the fill resolves
+// to another (possibly hidden) instance's gradient, blanking the mark.
+const gradId = `logo-gold-${useId()}`
 </script>
 
 <template>
   <span class="logo-mark" aria-hidden="true">
     <svg class="logo-svg" viewBox="0 0 543.67 627.4" role="img">
       <defs>
-        <linearGradient id="logo-gold" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient :id="gradId" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#ffe89a" />
           <stop offset="52%" stop-color="#e8c84a" />
           <stop offset="100%" stop-color="#c2911f" />
         </linearGradient>
       </defs>
 
-      <g fill="url(#logo-gold)">
+      <g :fill="`url(#${gradId})`">
         <g class="shake">
         <path id="anvil" d="M369.72,396.61h-53.8c2.35,5.03,4.28,9.69,6.64,14.13,10.74,20.27,26.21,36.43,44.27,50.28.94.72,2.41,1.02,3.63,1.04,6.76.1,13.53.05,20.47.05v15.48h-239.06v-15.47c5.37,0,10.72-.22,16.04.07,3.67.2,6.29-1.01,8.97-3.49,15-13.92,28.52-29.02,38.35-47.12,2.55-4.68,4.72-9.57,7.28-14.8h-49.42c-.05-1.21-.14-2.2-.14-3.2-.01-7.25-.12-14.51.05-21.76.05-2.33-.67-3.18-2.9-3.79-28.3-7.79-50.4-23.98-65.67-49.17-2.36-3.9-4.24-8.09-6.58-12.6h74.99v-16.9h196.8v24.8c19.06,4.59,35.38,13.9,50.23,27.18-6.44,4.9-12.5,9.8-18.87,14.28-8.95,6.31-18.49,11.63-28.8,15.43-1.86.69-2.59,1.59-2.54,3.65.15,6.21.05,12.43.05,18.65,0,1.01,0,2.02,0,3.26Z" />
         <path id="hammer" d="M181.04,212.46c-5.87-14.57-11.65-28.89-17.51-43.42,5.23-2.97,10.3-5.85,15.37-8.72,2.35-1.33,4.78-2.53,7.05-3.98,1.52-.97,2.54-.95,4,.25,15.12,12.5,30.32,24.92,45.47,37.39.8.66,1.55,1.56,1.94,2.5,7.12,17.49,14.19,35.01,21.26,52.52.1.24.13.52.27,1.1-12.45,7.01-24.97,14.06-37.76,21.26-9.37-12.55-18.66-24.97-28-37.47-45.67,25.73-91.11,51.33-136.81,77.08-4.03-7.15-7.99-14.16-12.09-21.43,45.63-25.7,91.06-51.29,136.83-77.08Z" />
