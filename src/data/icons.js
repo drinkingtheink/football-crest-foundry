@@ -8115,4 +8115,4 @@ export const iconsById = Object.fromEntries(icons.map(ic => [ic.id, ic]))
 // A symbol's `group` is its primary category; `extraGroups` lists any others it
 // also belongs to. iconCats returns the full membership list.
 export const iconCats = ic => (ic.extraGroups ? [ic.group, ...ic.extraGroups] : [ic.group])
-export const iconGroups = ['All', ...new Set([...icons.map(ic => ic.group), ...icons.flatMap(ic => ic.extraGroups || [])])]
+export const iconGroups = ['All', ...[...new Set([...icons.map(ic => ic.group), ...icons.flatMap(ic => ic.extraGroups || [])])].sort((a, b) => a.localeCompare(b))]

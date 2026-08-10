@@ -106,8 +106,14 @@ function chevronPath(t) {
   return `M 50,${apexY} L ${50 + halfW},${topY} L ${irx},${topY} L 50,${apexY - t} L ${ilx},${topY} L ${50 - halfW},${topY} Z`
 }
 
+// Custom (user-uploaded) symbols carry their own geometry on the instance;
+// built-ins resolve from the registry.
+function iconFor(sym) {
+  return sym.customPaths ? { paths: sym.customPaths, viewBox: sym.customViewBox } : iconsById[sym.iconId]
+}
+
 function symPaths(sym) {
-  const icon = iconsById[sym.iconId]
+  const icon = iconFor(sym)
   if (!icon?.supportsRing || sym.ringThickness == null) return icon?.paths ?? []
   if (icon.thicknessShape === 'chevron') return [chevronPath(sym.ringThickness)]
   const cx = 50, cy = 50, outerR = 44
@@ -931,11 +937,14 @@ const gradLine = computed(() => {
 <style>
 .resize-handle {
   fill: #ffffff;
-  stroke: #ff7a2e;
+  stroke: #00e5ff;
   stroke-width: 1.2;
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.65)) drop-shadow(0 0 4px rgba(0, 229, 255, 0.35));
 }
-.resize-handle:hover { fill: #ffd9b3; }
+.resize-handle:hover {
+  fill: #d6f7ff;
+  filter: drop-shadow(0 0 3px rgba(0, 229, 255, 0.9)) drop-shadow(0 0 7px rgba(0, 229, 255, 0.5));
+}
 
 .align-guide {
   stroke: #00e5ff;
