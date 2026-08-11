@@ -560,6 +560,45 @@ const snapshotPanelRef = ref(null)
 // fresh crest is forged.
 const activeDesign = ref(null)   // { id, name, source } | null
 
+// Edit-session persistence: while you're editing a SAVED crest, keep the live
+// working state (crest + scene) in localStorage so a refresh drops you back into
+// that session. When you're not editing a saved crest (a forged/random crest,
+// activeDesign === null), the key is cleared so refresh forges fresh, as before.
+const SESSION_KEY = 'crest-foundry:session'
+let sessionTimer = null
+
+function persistSession() {
+  clearTimeout(sessionTimer)
+  sessionTimer = setTimeout(() => {
+    if (!activeDesign.value) { try { localStorage.removeItem(SESSION_KEY) } catch {} return }
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        activeDesign: activeDesign.value,
+        config: JSON.parse(JSON.stringify(config)),
+        appBg: appBg.value,
+        patternTone: patternTone.value,
+        overlay: { color: overlay.color, opacity: overlay.opacity },
+      }))
+    } catch {}
+  }, 400)
+}
+
+function restoreSession() {
+  let saved = null
+  try { saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null') } catch { saved = null }
+  if (!saved?.activeDesign || !saved.config) return false
+  loadConfig(saved.config)
+  loadConfigFonts(saved.config)
+  activeDesign.value = saved.activeDesign
+  if (saved.appBg) appBg.value = saved.appBg
+  if (saved.patternTone) patternTone.value = saved.patternTone
+  if (saved.overlay) { overlay.color = saved.overlay.color; overlay.opacity = saved.overlay.opacity }
+  isCurated.value = false
+  return true
+}
+
+watch([activeDesign, config, appBg, patternTone, overlay], persistSession, { deep: true })
+
 async function doSaveSnapshot(name) {
   const svgEl = badgeWrap.value?.querySelector('svg')
   try {
@@ -651,7 +690,7 @@ const sharedTone    = ref(patternTones[Math.floor(Math.random() * patternTones.l
 const sharedOverlay = reactive({ color: '#000000', opacity: 0.7 })
 
 onMounted(async () => {
-  if (!sharedActive.value) return
+  if (!sharedActive.value) { restoreSession(); return }
   const token = new URLSearchParams(location.search).get('c')
   try {
     const d = await getSharedDesign(token)
@@ -860,6 +899,7 @@ onUnmounted(() => {
   document.removeEventListener('click', onDocumentClick)
   mobileMql?.removeEventListener('change', updateMobileForge)
   clearInterval(mobileForgeTimer)
+  clearTimeout(sessionTimer)
   clearTimeout(emberTimer)
   clearTimeout(weldDelayTimer)
   clearTimeout(weldCooldownTimer)
