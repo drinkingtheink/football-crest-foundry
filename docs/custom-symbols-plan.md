@@ -109,6 +109,25 @@ Support both: **file upload** (`.svg`) and **paste SVG markup** (textarea).
 - Per-crest **OG image** already works, and thanks to embedded geometry, shared
   crests with custom symbols will render — but a proper synced library is later.
 
+## Legal / UGC
+
+User uploads are user-generated content. Done for the **local-only** phase (low
+exposure — uploads stay in the browser, not hosted/distributed):
+- Terms of Use: added a **"Content you upload"** section (user keeps ownership;
+  responsible for having the rights; grants a limited license to store/process +
+  display when shared; no unlawful/infringing content; we may remove).
+- An inline **"only upload SVGs you have the right to use" (+ Terms link)** note
+  at the upload point in `MySymbols.vue`.
+
+**Prerequisites for the cloud + sharing phase** (once we *host* and especially
+*distribute* uploads between users):
+- A proper **UGC license grant** + user **warranties & indemnification**.
+- An **Acceptable Use / prohibited-content** policy.
+- A **DMCA / notice-and-takedown** process + designated contact (the big one once
+  symbols are publicly shareable).
+- Basic **moderation / removal** tooling, and a **report** affordance.
+- Privacy Policy: note that custom symbols are stored in the account (cloud).
+
 ## Related
 
 - Icon model + import tooling: `CLAUDE.md` (Icons section), `scripts/import-game-icons.mjs`.

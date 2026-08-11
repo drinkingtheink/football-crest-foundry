@@ -91,6 +91,10 @@ function hideTip() { tip.value = null }
       <button class="my-btn" @click="startUpload">⬆ Upload SVG</button>
       <button class="my-btn ghost" @click="startPaste">Paste markup</button>
     </div>
+    <p v-if="!adding" class="my-note">
+      Only upload simple, one-colour SVGs you have the right to use.
+      <a href="/terms.html" target="_blank" rel="noopener">Terms</a>
+    </p>
 
     <div v-else class="my-add">
       <textarea
@@ -208,6 +212,9 @@ function hideTip() { tip.value = null }
 
 .my-grid { display: flex; flex-wrap: wrap; gap: 5px; }
 .my-empty { font-size: 11px; color: #555; text-align: center; margin: 6px 0; }
+.my-note { margin: 0; font-size: 10px; color: #666; line-height: 1.5; }
+.my-note a { color: #9a9aa8; text-decoration: underline; }
+.my-note a:hover { color: var(--accent-warm); }
 
 .icon-btn {
   position: relative;
