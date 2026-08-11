@@ -92,7 +92,7 @@ function hideTip() { tip.value = null }
       <button class="my-btn ghost" @click="startPaste">Paste markup</button>
     </div>
     <p v-if="!adding" class="my-note">
-      Only upload simple, one-colour SVGs you have the right to use.
+      Only upload simple, one-color SVGs you have the right to use.
       <a href="/terms.html" target="_blank" rel="noopener">Terms</a>
     </p>
 
@@ -145,7 +145,7 @@ function hideTip() { tip.value = null }
       </button>
     </div>
     <p v-else-if="customSymbols.length" class="my-empty">No symbols match “{{ search }}”.</p>
-    <p v-else class="my-empty">No custom symbols yet. Upload a simple one-colour SVG.</p>
+    <p v-else class="my-empty">No custom symbols yet. Upload a simple one-color SVG.</p>
 
     <Teleport to="body">
       <div

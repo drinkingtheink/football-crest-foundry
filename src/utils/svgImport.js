@@ -29,7 +29,7 @@ export function svgToSymbol(svgText) {
   // Reject anything that isn't plain geometry.
   for (const tag of BANNED) {
     if (svg.querySelector(tag)) {
-      return { error: `Only simple one-colour SVGs are supported (found <${tag}>).` }
+      return { error: `Only simple one-color SVGs are supported (found <${tag}>).` }
     }
   }
 
@@ -47,8 +47,8 @@ export function svgToSymbol(svgText) {
     const style = (el.getAttribute('style') || '').toLowerCase()
     if (style.includes('url(')) gradient = true
   }
-  if (gradient) return { error: 'Gradients/patterns aren’t supported — use a flat one-colour icon.' }
-  if (colours.size > 1) return { error: 'That SVG uses multiple colours — use a simple one-colour icon.' }
+  if (gradient) return { error: 'Gradients/patterns aren’t supported — use a flat one-color icon.' }
+  if (colours.size > 1) return { error: 'That SVG uses multiple colors — use a simple one-color icon.' }
 
   // Establish the coordinate box: viewBox (preferred) or width/height.
   const vb = parseViewBox(svg)
