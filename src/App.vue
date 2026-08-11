@@ -368,13 +368,23 @@ function onPickIcon(iconId) {
   if (iconId === 'shape:rect') { addRect(); return } // gallery rectangle tile
   const sel = selectedSymbolId.value && config.symbols.find(s => s.instanceId === selectedSymbolId.value)
   if (sel && sel.kind !== 'rect') {
-    updateSymbol(selectedSymbolId.value, { iconId }) // swap the selected icon
+    // swap to a built-in icon — clear any custom geometry from the previous one
+    updateSymbol(selectedSymbolId.value, { iconId, customPaths: undefined, customViewBox: undefined, customLabel: undefined })
   } else {
     addSymbol(iconId)                                // nothing (or a rect) selected → add new
   }
 }
 
-function onAddCustom(cs) { addCustomSymbol(cs) }   // { id, label, paths, viewBox }
+// { id, label, paths, viewBox }. Mirror onPickIcon: swap the selected symbol in
+// place (built-in↔custom or custom↔custom), otherwise add a new one.
+function onAddCustom(cs) {
+  const sel = selectedSymbolId.value && config.symbols.find(s => s.instanceId === selectedSymbolId.value)
+  if (sel && sel.kind !== 'rect') {
+    updateSymbol(selectedSymbolId.value, { iconId: cs.id, customPaths: cs.paths, customViewBox: cs.viewBox, customLabel: cs.label })
+  } else {
+    addCustomSymbol(cs)
+  }
+}
 
 // Placed-symbols thumbnail: use the icon's own viewBox, and scale strokeWidth
 // (authored in 100-unit space) to it so the preview matches the badge.
