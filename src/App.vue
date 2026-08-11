@@ -96,6 +96,16 @@ const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
 const patternTone = ref('dark')
 const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 })
 
+// Viewport zoom for the crest — preview only (exports clone the SVG, untouched).
+// Driven by the wheel when nothing is selected; see forwardScroll. Zoom feeds the
+// SVG's intrinsic render size (not a CSS transform scale) so it stays vector-crisp
+// instead of upscaling a cached/composited bitmap of the badge-tilt layer.
+const CREST_BASE_SIZE = 380
+const crestZoom = ref(1)
+const CREST_ZOOM_MIN = 0.4
+const CREST_ZOOM_MAX = 4
+const crestRenderSize = computed(() => Math.round(CREST_BASE_SIZE * crestZoom.value))
+
 const activeClub = ref(initialClub)
 // True while showing an unedited curated crest from the library (drives the badge).
 const LIBRARY_CHANCE = 0.08
@@ -805,6 +815,13 @@ function spitEmber() {
 }
 
 function forwardScroll(e) {
+  // Nothing selected: the wheel zooms the crest in the viewport. With a
+  // selection, keep forwarding the scroll to the sidebar so its controls scroll.
+  if (!selection.value.length) {
+    const next = crestZoom.value * (1 - e.deltaY * 0.0015)
+    crestZoom.value = Math.min(CREST_ZOOM_MAX, Math.max(CREST_ZOOM_MIN, next))
+    return
+  }
   controlsPane.value?.scrollBy({ top: e.deltaY, behavior: 'auto' })
 }
 
@@ -1232,7 +1249,7 @@ function stepBg(dir) {
             :config="config"
             :selected-symbol-id="selectedSymbolId"
             :selection="selection"
-            :size="380"
+            :size="crestRenderSize"
             uid="main"
             @update-text="updateText"
             @update-text-position="updateTextPosition"
