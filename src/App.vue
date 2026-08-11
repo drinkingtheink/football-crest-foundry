@@ -102,8 +102,8 @@ const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 }
 // instead of upscaling a cached/composited bitmap of the badge-tilt layer.
 const CREST_BASE_SIZE = 380
 const crestZoom = ref(1)
-const CREST_ZOOM_MIN = 0.4
-const CREST_ZOOM_MAX = 4
+const CREST_ZOOM_MIN = 1
+const CREST_ZOOM_MAX = 2.25
 const crestRenderSize = computed(() => Math.round(CREST_BASE_SIZE * crestZoom.value))
 
 const activeClub = ref(initialClub)
