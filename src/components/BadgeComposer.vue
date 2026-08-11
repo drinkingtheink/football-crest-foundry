@@ -303,7 +303,17 @@ function startTextResize(e, hx, hy) {
 }
 
 function onMove(e) {
-  if (!drag.value) return
+  if (!drag.value) {
+    // Keep the "Scroll to resize" tooltip honest — a text element's mouseleave
+    // can be missed (it resizes/re-renders out from under the pointer), leaving
+    // the tooltip stuck. Any move not over a text element dismisses it.
+    if (textTooltip.value) {
+      const overText = e.target?.closest?.('[data-text-id]')
+      if (overText) textTooltip.value = { x: e.clientX, y: e.clientY }
+      else { textTooltip.value = null; hoveredTextId.value = null }
+    }
+    return
+  }
 
   if (drag.value.mode === 'resize') {
     const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
@@ -380,6 +390,15 @@ function stopDrag() {
   }
   drag.value = null
   guides.value = { x: false, y: false }
+}
+
+// Leaving the stage: end any drag and drop all hover state/tooltips so nothing
+// (e.g. the "Scroll to resize" tooltip) lingers on-screen.
+function onStageLeave() {
+  stopDrag()
+  textTooltip.value = null
+  hoveredTextId.value = null
+  hoveredSymbolId.value = null
 }
 
 // ── Hover highlight ────────────────────────────────────────────────────────
@@ -581,7 +600,7 @@ const gradLine = computed(() => {
     :style="{ userSelect: 'none', display: 'block', overflow: 'visible', filter: config.noShield ? 'none' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.38)) drop-shadow(0 10px 28px rgba(0,0,0,0.42)) drop-shadow(0 22px 48px rgba(0,0,0,0.22))' }"
     @mousemove="onMove"
     @mouseup="stopDrag"
-    @mouseleave="stopDrag"
+    @mouseleave="onStageLeave"
     @click="emit('deselect')"
   >
     <!-- Hidden path used for isPointInFill hit-testing (must be in main SVG tree, not defs) -->
