@@ -41,6 +41,12 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
               Background photography from
               <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.
             </p>
+            <p class="about-text" style="margin-top: 8px;">
+              Many club colour palettes from
+              <a href="https://github.com/jimniels/teamcolors" target="_blank" rel="noopener">teamcolors</a>
+              by Jim Nielsen, licensed under
+              <a href="https://opensource.org/license/mit" target="_blank" rel="noopener">MIT</a>.
+            </p>
           </div>
 
           <p class="about-legal">

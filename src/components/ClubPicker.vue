@@ -23,10 +23,22 @@ function reshuffle() {
   open.value = true
 }
 
+// Sport aliases so "nfl", "hockey", "soccer" etc. all find their teams.
+const SPORT_ALIASES = {
+  Soccer: ['soccer', 'football', 'epl', 'mls'],
+  Baseball: ['baseball', 'mlb'],
+  Basketball: ['basketball', 'nba', 'hoops'],
+  Football: ['football', 'american football', 'gridiron', 'nfl'],
+  Hockey: ['hockey', 'nhl', 'ice hockey'],
+}
+function matchesSport(club, q) {
+  return (SPORT_ALIASES[club.sport] || [club.sport?.toLowerCase()]).some(a => a.includes(q))
+}
+
 const results = computed(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) return randomSample.value
-  return clubs.filter(c => c.name.toLowerCase().includes(q)).slice(0, 8)
+  return clubs.filter(c => c.name.toLowerCase().includes(q) || matchesSport(c, q)).slice(0, 8)
 })
 
 function select(club) {
@@ -42,7 +54,7 @@ function select(club) {
       <input
         class="cp-input"
         type="text"
-        placeholder="Search 88 clubs…"
+        :placeholder="`Search ${clubs.length} clubs by name or sport…`"
         v-model="query"
         @focus="open = true"
         @input="open = true"
@@ -67,7 +79,10 @@ function select(club) {
           :style="{ '--i': i }"
           @mousedown.prevent="select(club)"
         >
-          <span class="cp-name">{{ club.name }}</span>
+          <span class="cp-info">
+            <span class="cp-name">{{ club.name }}</span>
+            <span v-if="club.sport" class="cp-sport">{{ club.sport }}</span>
+          </span>
           <span class="cp-swatches">
             <span
               v-for="color in club.colors"
@@ -192,7 +207,32 @@ function select(club) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.cp-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
   flex: 1;
+}
+
+/* Subdued gold pill — dimmed so it never competes with the palette swatches. */
+.cp-sport {
+  align-self: flex-start;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #e8c84a;
+  background: rgba(232, 200, 74, 0.04);
+  border: 1px solid rgba(232, 200, 74, 0.85);
+  border-radius: 4px;
+  padding: 1px 6px;
+  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.1), 0 0 10px rgba(232, 200, 74, 0.25);
+  opacity: 0.5;
 }
 
 .cp-swatches {
