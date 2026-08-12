@@ -460,7 +460,7 @@ watch(() => selection.value.length, (n) => { if (n) { tilt.rx = 0; tilt.ry = 0 }
 // Idle = nothing selected/being edited and not mid-drag.
 const WELD_LAP_MS = 1600       // duration of one full rotation around the outline
 const WELD_EMIT = 20           // sparks emitted per frame at the weld head
-const WELD_CYCLE_MS = 15000    // how often the idle spark circle fires
+const WELD_CYCLE_MS = 60000    // how often the idle spark circle fires
 const weldCanvas = ref(null)
 let weldField = null
 let idleWeldTimer = null
