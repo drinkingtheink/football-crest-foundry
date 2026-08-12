@@ -43,6 +43,16 @@ export function useAuth() {
     // On success the browser redirects to Google; nothing more runs here.
   }
 
+  async function signInWithGitHub() {
+    if (!isSupabaseConfigured) throw new Error('Cloud sync is not configured.')
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) throw error
+    // On success the browser redirects to GitHub; nothing more runs here.
+  }
+
   async function signOut() {
     if (!isSupabaseConfigured) return
     await supabase.auth.signOut()
@@ -51,6 +61,6 @@ export function useAuth() {
 
   return {
     user, email, isSignedIn, ready, isSupabaseConfigured,
-    signInWithEmail, signInWithGoogle, signOut,
+    signInWithEmail, signInWithGoogle, signInWithGitHub, signOut,
   }
 }
