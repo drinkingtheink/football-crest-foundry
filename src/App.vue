@@ -24,7 +24,7 @@ import { icons, iconsById } from './data/icons.js'
 import { crestLibrary } from './data/crestLibrary.js'
 import { auroraBg, wavesBg, crisscrossBg, pinstripeBg, diamondsBg, dotsBg, gridBg, zigzagBg } from './utils/patterns.js'
 import { randomFonts, loadFont } from './utils/fonts.js'
-import { exportCrestPng, exportCrestSvg, crestFilename } from './utils/exportBadge.js'
+import { exportCrestPng, exportCrestSvg, crestFilename, copyCrestPngToClipboard, canCopyImageToClipboard } from './utils/exportBadge.js'
 import { createSparkField } from './utils/particles.js'
 import { useToast } from './composables/useToast.js'
 
@@ -1114,6 +1114,23 @@ async function exportCrest(format) {
 const exportPng = () => exportCrest('png')
 const exportSvg = () => exportCrest('svg')
 
+const canCopyImage = canCopyImageToClipboard()
+const isCopying = ref(false)
+
+async function copyCrest() {
+  const svgEl = badgeComposerRef.value?.svgRootEl
+  if (!svgEl || isCopying.value) return
+  isCopying.value = true
+  try {
+    await copyCrestPngToClipboard(svgEl, { texts: config.texts })
+    addToast('Copied to clipboard', { type: 'tip', duration: 2500 })
+  } catch (e) {
+    addToast(e?.message || 'Copy failed — please try again', { type: 'tip', duration: 4000 })
+  } finally {
+    isCopying.value = false
+  }
+}
+
 function stepBg(dir) {
   const idx = bgOptions.findIndex(o => o.id === appBg.value)
   appBg.value = bgOptions[(idx + dir + bgOptions.length) % bgOptions.length].id
@@ -1279,6 +1296,9 @@ function stepBg(dir) {
             </button>
             <button class="export-png-btn" :disabled="isExporting" @click="exportSvg" title="Download this crest as a self-contained SVG">
               {{ isExporting ? '…' : '⬇ SVG' }}
+            </button>
+            <button v-if="canCopyImage" class="export-png-btn" :disabled="isCopying" @click="copyCrest" title="Copy this crest to the clipboard as a PNG">
+              {{ isCopying ? '…' : '⧉ Copy' }}
             </button>
             <button class="share-crest-btn" @click="requestShare" title="Share this crest with a link">
               ⤴ Share

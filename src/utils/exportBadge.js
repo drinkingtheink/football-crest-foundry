@@ -266,8 +266,9 @@ async function outlineTexts(liveSvg, clone, texts) {
 
 // ── Public API ──────────────────────────────────────────────────────────────
 
-// Rasterize the live badge <svg> to a transparent PNG and download it.
-export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filename = 'crest.png' } = {}) {
+// Rasterize the live badge <svg> to a transparent PNG blob (no download). Shared
+// by both the PNG download and the clipboard copy.
+export async function renderCrestPngBlob(svgEl, { texts = [], pxWidth = 1600 } = {}) {
   const frame = exportFrame(svgEl)
   const clone = buildCleanCrestSvg(svgEl)
   await embedFontsInto(clone, texts)
@@ -281,7 +282,7 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
   const svgStr = new XMLSerializer().serializeToString(clone)
   const url = URL.createObjectURL(new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' }))
   try {
-    await new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       const img = new Image()
       img.onload = () => {
         const canvas = document.createElement('canvas')
@@ -290,8 +291,7 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
         canvas.getContext('2d').drawImage(img, 0, 0, outW, outH)
         canvas.toBlob((pngBlob) => {
           if (!pngBlob) return reject(new Error('PNG encode failed'))
-          triggerDownload(pngBlob, filename)
-          resolve()
+          resolve(pngBlob)
         }, 'image/png')
       }
       img.onerror = () => reject(new Error('SVG render failed'))
@@ -300,6 +300,31 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
   } finally {
     URL.revokeObjectURL(url)
   }
+}
+
+// Rasterize the live badge <svg> to a transparent PNG and download it.
+export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filename = 'crest.png' } = {}) {
+  const blob = await renderCrestPngBlob(svgEl, { texts, pxWidth })
+  triggerDownload(blob, filename)
+}
+
+// True when this browser can write an image to the clipboard.
+export function canCopyImageToClipboard() {
+  return typeof navigator !== 'undefined'
+    && !!navigator.clipboard
+    && typeof navigator.clipboard.write === 'function'
+    && typeof ClipboardItem !== 'undefined'
+}
+
+// Copy the crest as a transparent PNG to the system clipboard. Passes a Blob
+// *promise* to ClipboardItem so Safari keeps the write bound to the user gesture
+// while the (async) rasterisation runs.
+export async function copyCrestPngToClipboard(svgEl, { texts = [], pxWidth = 1600 } = {}) {
+  if (!canCopyImageToClipboard()) {
+    throw new Error('Copying images to the clipboard isn’t supported in this browser.')
+  }
+  const item = new ClipboardItem({ 'image/png': renderCrestPngBlob(svgEl, { texts, pxWidth }) })
+  await navigator.clipboard.write([item])
 }
 
 // Export the badge as a self-contained, transparent SVG with all text converted
