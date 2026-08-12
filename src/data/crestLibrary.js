@@ -134,4 +134,65 @@ export const crestLibrary = [
       "border": { "color": "#D3D5D7", "width": 7 }
     },
   },
+  {
+    name: 'Grand Ephemeris',
+    config: {
+      "shapeId": "sh-crown-notch",
+      "noShield": false,
+      "palette": ["#ED174C", "#006BB6", "#061922", "#BEC0C2", "#ffffff"],
+      "background": { "type": "striped-diagonal", "stripeCount": 16, "sashWidth": 68, "sunburstRays": 12, "gradient": ["#ED174C", "#006BB6"], "gradientAngle": 45 },
+      "symbols": [
+        { "instanceId": "sym-14", "iconId": "banner-straight", "color": "#ffffff", "x": 99.57746505737305, "y": 185.87672920152545, "size": 196, "rotation": 0, "flipH": false, "strokeColor": "#BEC0C2", "strokeWidth": 2.5, "clipped": false },
+        { "instanceId": "sym-15", "iconId": "gi-astronaut", "color": "#ffffff", "x": 99.9950065612793, "y": 134.7714300453663, "size": 88, "rotation": 0, "flipH": false, "strokeColor": "#006BB6", "strokeWidth": 0, "clipped": true },
+        { "instanceId": "sym-17", "iconId": "sparkle", "color": "#ffffff", "x": 99.9950065612793, "y": 130.56062579154968, "size": 27, "rotation": 0, "flipH": false, "strokeColor": "#ffffff", "strokeWidth": 0, "clipped": true },
+        { "instanceId": "sym-28", "iconId": "lightning-bolt", "color": "#ffffff", "x": 99.9950065612793, "y": 57.7681827545166, "size": 63, "rotation": 0, "flipH": false, "strokeColor": "#ED174C", "strokeWidth": 0, "clipped": true },
+        { "instanceId": "sym-39", "iconId": "gi-lyre", "color": "#ffffff", "x": 131.50236129760742, "y": 73.18202590942383, "size": 31, "rotation": 0, "flipH": false, "strokeColor": "#ED174C", "strokeWidth": 0, "clipped": true },
+        { "instanceId": "sym-42", "iconId": "ss-884015", "color": "#ffffff", "x": 129.15498101711273, "y": 20.54529160261154, "size": 50, "rotation": 0, "flipH": false, "strokeColor": "#ED174C", "strokeWidth": 0, "clipped": false },
+        { "instanceId": "sym-43", "iconId": "ss-884015", "color": "#ffffff", "x": 71.2956212759018, "y": 20.54529160261154, "size": 50, "rotation": 0, "flipH": true, "strokeColor": "#ED174C", "strokeWidth": 0, "clipped": false },
+        { "instanceId": "sym-45", "iconId": "hoop", "color": "#ffffff", "x": 66.01589870452881, "y": 73.68202590942383, "size": 32, "rotation": 0, "flipH": false, "strokeColor": "#ED174C", "strokeWidth": 0, "clipped": true }
+      ],
+      "texts": [
+        { "fontFamily": "Uncial Antiqua", "fontWeight": "bold", "fontSize": 12, "color": "#006BB6", "strokeColor": "#006BB6", "strokeWidth": 0.75, "letterSpacing": 0, "rotation": 0, "arc": null, "arcRx": 78, "arcRy": 78, "arcX": 100, "arcY": 120, "archHeight": 40, "x": 99.87314224243164, "y": 183.58495330810547, "id": "club-name", "content": "GRAND EPHEMERIS" },
+        { "fontFamily": "Khand", "fontWeight": "bold", "fontSize": 11, "color": "#ffffff", "strokeColor": "#000000", "strokeWidth": 0, "letterSpacing": 0, "rotation": 0, "arc": null, "arcRx": 78, "arcRy": 78, "arcX": 100, "arcY": 120, "archHeight": 40, "x": 99.99500274658203, "y": 206.59522247314453, "id": "text-38", "content": "2012" }
+      ],
+      "border": { "color": "#ffffff", "width": 6.5 }
+    },
+  },
+  {
+    name: 'Gilded Spider',
+    config: {
+      "shapeId": "sh2-lozenge",
+      "noShield": false,
+      "palette": ["#004170", "#DA291C", "#CEAB5D", "#FFFFFF"],
+      "background": { "type": "striped-h", "stripeCount": 16, "sashWidth": 174, "sunburstRays": 12, "gradient": ["#004170", "#DA291C"], "gradientAngle": 45 },
+      "symbols": [
+        { "instanceId": "sym-56", "iconId": "gi-spider", "color": "#CEAB5D", "x": 100.0752305984497, "y": 121.63538646697998, "size": 95, "rotation": 0, "flipH": false, "strokeColor": "#DA291C", "strokeWidth": 5, "clipped": true },
+        { "instanceId": "sym-57", "iconId": "banner-arched", "color": "#CEAB5D", "x": 100, "y": 71.39474207162857, "size": 175, "rotation": 0, "flipH": false, "strokeColor": "#DA291C", "strokeWidth": 0, "clipped": false },
+        { "instanceId": "sym-58", "iconId": "cr-fleury", "color": "#FFFFFF", "x": 99.99002075195312, "y": 96.10983276367188, "size": 26, "rotation": 0, "flipH": false, "strokeColor": "#FFFFFF", "strokeWidth": 0, "clipped": true }
+      ],
+      "texts": [
+        { "fontFamily": "Aldrich", "fontWeight": "bold", "fontSize": 11, "color": "#ffffff", "strokeColor": "#004170", "strokeWidth": 2.75, "letterSpacing": -0.5, "rotation": 0, "arc": "arch", "arcRx": 78, "arcRy": 78, "arcX": 100, "arcY": 85.0119514465332, "archHeight": 48, "x": 103.49790954589844, "y": 55, "id": "club-name", "content": "CREST FOUNDRY" },
+        { "fontFamily": "Kelly Slab", "fontWeight": "bold", "fontSize": 22, "color": "#ffffff", "strokeColor": "#004170", "strokeWidth": 2.75, "letterSpacing": 3, "rotation": 0, "arc": null, "arcRx": 78, "arcRy": 78, "arcX": 100, "arcY": 120, "archHeight": 40, "x": 99.99999237060547, "y": 185, "id": "monogram", "content": "FC" }
+      ],
+      "border": { "color": "#CEAB5D", "width": 4 }
+    },
+  },
+  {
+    name: 'Diving Crane',
+    config: {
+      "shapeId": "traditional-english",
+      "noShield": false,
+      "palette": ["#005CA8", "#FFFFFF", "#CCA738"],
+      "background": { "type": "striped-diagonal", "stripeCount": 4, "sashWidth": 174, "sunburstRays": 12, "gradient": ["#005CA8", "#FFFFFF"], "gradientAngle": 45 },
+      "symbols": [
+        { "instanceId": "sym-init", "iconId": "crane-diving", "color": "#FFFFFF", "x": 100.25177001953125, "y": 111.21650695800781, "size": 132, "strokeColor": "#CCA738", "strokeWidth": 4.5 },
+        { "instanceId": "sym-1", "iconId": "ss-149172", "color": "#CCA738", "x": 107.89473724365234, "y": 97.55207061767578, "size": 27, "rotation": 0, "flipH": false, "strokeColor": "#005CA8", "strokeWidth": 0, "clipped": true }
+      ],
+      "texts": [
+        { "fontFamily": "Monoton", "fontWeight": "bold", "fontSize": 13, "color": "#CCA738", "strokeColor": "#005CA8", "strokeWidth": 4.25, "letterSpacing": 2, "rotation": 0, "arc": null, "arcRx": 78, "arcRy": 78, "arcX": 100, "arcY": 120, "archHeight": 40, "x": 101.63650512695312, "y": 33.58961296081543, "id": "club-name", "content": "CREST FOUNDRY" },
+        { "fontFamily": "EB Garamond", "fontWeight": "bold", "fontSize": 39, "color": "#ffffff", "strokeColor": "#000000", "strokeWidth": 0, "letterSpacing": 3, "rotation": 0, "arc": null, "arcRx": 78, "arcRy": 78, "arcX": 100, "arcY": 120, "archHeight": 40, "x": 100, "y": 185, "id": "monogram", "content": "FC" }
+      ],
+      "border": { "color": "#CCA738", "width": 7 }
+    },
+  },
 ]
