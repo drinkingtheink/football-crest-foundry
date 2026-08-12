@@ -27,7 +27,8 @@ const { toasts, dismiss } = useToast()
    so the offset tracks the responsive sidebar width. */
 .toast-stack {
   position: fixed;
-  top: 24px;
+  /* Clear the top-anchored instructions bar (.drag-hint sits at top:16px, ~24px tall). */
+  top: 56px;
   left: calc(50% - 150px);
   transform: translateX(-50%);
   display: flex;
