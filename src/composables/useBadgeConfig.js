@@ -274,6 +274,13 @@ export function useBadgeConfig() {
     if (config.texts.length === 0) config.texts.push(...DEFAULT_TEXTS())
   }
 
+  // Replace all text with the default club-name + monogram — drops any extra
+  // rows, custom content, or arc/stroke carried over from a loaded/curated crest
+  // so it can't bleed into a subsequent procedural forge.
+  function resetTexts() {
+    config.texts.splice(0, config.texts.length, ...DEFAULT_TEXTS())
+  }
+
   function pasteSymbol(source) {
     const instanceId = `sym-${nextId++}`
     config.symbols.push({ ...source, instanceId, x: source.x + 8, y: source.y + 8 })
@@ -374,6 +381,7 @@ export function useBadgeConfig() {
     selectSymbol,
     addText,
     ensureDefaultTexts,
+    resetTexts,
     removeText,
     updateText,
     updateTextPosition,

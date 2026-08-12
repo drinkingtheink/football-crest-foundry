@@ -64,6 +64,7 @@ const {
   selectSymbol,
   addText,
   ensureDefaultTexts,
+  resetTexts,
   removeText,
   updateText,
   updateTextPosition,
@@ -453,72 +454,21 @@ function onBadgeLeave() {
 watch(() => selection.value.length, (n) => { if (n) { tilt.rx = 0; tilt.ry = 0 } })
 
 // ── Welding sparks ──────────────────────────────────────────────────────────
-// After a sustained IDLE hover over the crest, spray a dense sputter of sparks
-// from behind the shield seam, following its outline — like welding, not
-// fireworks. Idle = nothing selected/being edited and not mid-drag.
-const EDGE_SPARK_DELAY = 2000  // ms of idle hover before the first weld pass (2s for testing)
+// While the crest is IDLE, a weld head sweeps once around the shield outline
+// every WELD_CYCLE_MS, spraying a dense sputter of sparks from behind the seam
+// — like welding, not fireworks. Fires on a timer regardless of hover.
+// Idle = nothing selected/being edited and not mid-drag.
 const WELD_LAP_MS = 1600       // duration of one full rotation around the outline
-const WELD_COOLDOWN = 10000    // pause between passes
 const WELD_EMIT = 20           // sparks emitted per frame at the weld head
+const WELD_CYCLE_MS = 15000    // how often the idle spark circle fires
 const weldCanvas = ref(null)
 let weldField = null
-const welding = ref(false)     // armed (idle-hovering) — laps repeat with a cooldown between
-let weldDelayTimer = null
-let weldCooldownTimer = null
-let weldRaf = null
-let weldPhase = 0
-let weldLastT = 0
-let weldSweeping = false
+let idleWeldTimer = null
 
 function crestIdle() { return selection.value.length === 0 && !isDraggingEl.value }
 
-// One pass: a weld head sweeps 0→1 around the outline, spitting sparks, then
-// hands off to a cooldown before the next pass.
-function weldTick(now) {
-  if (!welding.value || !weldSweeping) { weldRaf = null; return }
-  const comp = badgeComposerRef.value
-  const canvas = weldCanvas.value
-  if (!comp?.outlinePointAt || !canvas || !weldField) { weldRaf = null; return }
-
-  const dt = Math.min(64, now - weldLastT); weldLastT = now
-  weldPhase += dt / WELD_LAP_MS
-  const r = canvas.getBoundingClientRect()
-  const p = comp.outlinePointAt(weldPhase)
-  if (p) weldField.weld(p.x - r.left, p.y - r.top, p.nx, p.ny, p.tx, p.ty, WELD_EMIT)
-
-  if (weldPhase >= 1) {                       // lap complete → cool down, then lap again
-    weldSweeping = false
-    weldRaf = null
-    clearTimeout(weldCooldownTimer)
-    weldCooldownTimer = setTimeout(() => {
-      if (welding.value && overCrest.value && crestIdle()) startLap()
-    }, WELD_COOLDOWN)
-    return
-  }
-  weldRaf = requestAnimationFrame(weldTick)
-}
-
-function startLap() {
-  weldPhase = 0
-  weldSweeping = true
-  weldLastT = performance.now()
-  if (!weldRaf) weldRaf = requestAnimationFrame(weldTick)
-}
-function startWelding() {
-  if (welding.value) return
-  welding.value = true
-  startLap()
-}
-function stopWelding() {
-  welding.value = false
-  weldSweeping = false
-  clearTimeout(weldCooldownTimer)
-  if (weldRaf) { cancelAnimationFrame(weldRaf); weldRaf = null }
-}
-
-// A one-shot weld lap fired by an action (export / copy / share) — a flourish
-// of sparks around the outline. Runs on its own rAF so it never interferes with
-// the idle-hover weld state machine.
+// A one-shot weld lap around the outline — a flourish of sparks. Fired both by
+// actions (export / copy / share) and by the idle cadence timer below.
 let weldPulseRaf = null
 let weldPulsePhase = 0
 let weldPulseLastT = 0
@@ -541,19 +491,13 @@ function pulseWeld() {
   if (!weldPulseRaf) weldPulseRaf = requestAnimationFrame(weldPulseTick)
 }
 
-function evalWeld() {
-  if (overCrest.value && crestIdle() && !reduceMotion) {
-    if (welding.value) return
-    clearTimeout(weldDelayTimer)
-    weldDelayTimer = setTimeout(() => { if (overCrest.value && crestIdle()) startWelding() }, EDGE_SPARK_DELAY)
-  } else {
-    clearTimeout(weldDelayTimer)
-    stopWelding()
-  }
+// Ambient idle flourish: fire a one-shot weld lap on a fixed cadence — hover or
+// not — as long as the crest is idle and motion isn't reduced.
+function startIdleWeld() {
+  if (reduceMotion) return
+  clearInterval(idleWeldTimer)
+  idleWeldTimer = setInterval(() => { if (crestIdle()) pulseWeld() }, WELD_CYCLE_MS)
 }
-watch(overCrest, evalWeld)
-watch(selection, evalWeld, { deep: true })
-watch(isDraggingEl, evalWeld)
 
 function onKeyDown(e) {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
@@ -950,6 +894,7 @@ onMounted(() => {
       if (!reduceMotion) spitEmber()
     }
     if (weldCanvas.value) weldField = createSparkField(weldCanvas.value)
+    startIdleWeld()
   })
 })
 
@@ -962,9 +907,8 @@ onUnmounted(() => {
   clearInterval(mobileForgeTimer)
   clearTimeout(sessionTimer)
   clearTimeout(emberTimer)
-  clearTimeout(weldDelayTimer)
-  clearTimeout(weldCooldownTimer)
-  cancelAnimationFrame(weldRaf)
+  clearInterval(idleWeldTimer)
+  cancelAnimationFrame(weldPulseRaf)
   sparkField?.stop()
   weldField?.stop()
 })
@@ -1011,6 +955,7 @@ function startOver() {
 function randomizeAll() {
   // A forged crest is a new design, not an edit of whatever was loaded.
   activeDesign.value = null
+  const leavingCurated = isCurated.value
   // Small chance to surface a curated crest from the library instead of a
   // procedurally-generated one (loaded verbatim).
   if (crestLibrary.length && Math.random() < LIBRARY_CHANCE) {
@@ -1023,6 +968,9 @@ function randomizeAll() {
     return
   }
   isCurated.value = false
+  // Forging away from a curated crest: reset to the default club-name + monogram
+  // so the curated entry's text (content, extra rows, arc) doesn't carry over.
+  if (leavingCurated) resetTexts()
 
   const club     = clubs[Math.floor(Math.random() * clubs.length)]
   const shape    = shapes[Math.floor(Math.random() * shapes.length)]
@@ -1446,10 +1394,16 @@ function stepBg(dir) {
         </div>
 
         <div class="forge-block">
-        <button class="randomize-btn" title="Forge a new crest" @click="randomizeAll">
-          <svg class="randomize-bolt" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z"/></svg>
-          <span class="randomize-label">Forge Random Crest</span>
-        </button>
+        <div class="forge-btn-wrap">
+          <span class="forge-btn-glow" aria-hidden="true"></span>
+          <span class="forge-btn-embers" aria-hidden="true">
+            <i class="fember f1" /><i class="fember f2" /><i class="fember f3" /><i class="fember f4" /><i class="fember f5" /><i class="fember f6" /><i class="fember f7" /><i class="fember f8" /><i class="fember f9" /><i class="fember f10" /><i class="fember f11" /><i class="fember f12" /><i class="fember f13" /><i class="fember f14" /><i class="fember f15" /><i class="fember f16" />
+          </span>
+          <button class="randomize-btn" title="Forge a new crest" @click="randomizeAll">
+            <svg class="randomize-bolt" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z"/></svg>
+            <span class="randomize-label">Forge Random Crest</span>
+          </button>
+        </div>
 
         <!-- Shield / No Shield mode -->
         <div class="mode-switch" role="group" aria-label="Shield mode">
@@ -2200,9 +2154,85 @@ function stepBg(dir) {
   15%  { opacity: 1; }
   100% { opacity: 0; left: 130%; }
 }
+
+/* Foundry-modal treatment: a molten rim glowing along the top edge with
+   embers pouring off it, radiating heat. The button keeps overflow:hidden
+   for its sheen, so the emitters live on this un-clipped wrapper instead. */
+.forge-btn-wrap {
+  position: relative;
+}
+.forge-btn-glow {
+  position: absolute;
+  top: -1px;
+  left: 6%;
+  right: 6%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 150, 45, 0.85) 20%, rgba(255, 190, 80, 0.95) 50%, rgba(255, 150, 45, 0.85) 80%, transparent);
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: 2;
+  animation: forge-btn-rim 3.2s ease-in-out infinite;
+}
+@keyframes forge-btn-rim {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+.forge-btn-embers {
+  position: absolute;
+  top: -2px;
+  left: 6%;
+  right: 6%;
+  height: 1px;
+  pointer-events: none;
+  z-index: 2;
+}
+.forge-btn-embers .fember {
+  position: absolute;
+  top: 0;
+  width: 2.5px;
+  height: 2.5px;
+  border-radius: 50%;
+  background: #ffe0a0;
+  box-shadow: 0 0 5px 1px rgba(255, 140, 40, 0.9);
+  opacity: 0;
+  animation: forge-btn-ember-rise 3.4s ease-out infinite;
+}
+.forge-btn-embers .fember:nth-child(3n) {
+  width: 3.5px;
+  height: 3.5px;
+  background: #fff1c6;
+  box-shadow: 0 0 8px 1.5px rgba(255, 155, 50, 1);
+}
+.forge-btn-embers .f1  { left: 3%;  --dx: -5px; animation-duration: 3.2s; animation-delay: -0.2s; }
+.forge-btn-embers .f2  { left: 10%; --dx: 3px;  animation-duration: 4.1s; animation-delay: -1.4s; }
+.forge-btn-embers .f3  { left: 17%; --dx: -3px; animation-duration: 3.6s; animation-delay: -2.7s; }
+.forge-btn-embers .f4  { left: 24%; --dx: 6px;  animation-duration: 4.4s; animation-delay: -0.8s; }
+.forge-btn-embers .f5  { left: 31%; --dx: -2px; animation-duration: 3.9s; animation-delay: -2.1s; }
+.forge-btn-embers .f6  { left: 38%; --dx: 4px;  animation-duration: 3.4s; animation-delay: -3.3s; }
+.forge-btn-embers .f7  { left: 45%; --dx: -6px; animation-duration: 4.6s; animation-delay: -1.1s; }
+.forge-btn-embers .f8  { left: 52%; --dx: 2px;  animation-duration: 3.7s; animation-delay: -2.5s; }
+.forge-btn-embers .f9  { left: 59%; --dx: -4px; animation-duration: 4.2s; animation-delay: -0.5s; }
+.forge-btn-embers .f10 { left: 66%; --dx: 5px;  animation-duration: 3.5s; animation-delay: -1.9s; }
+.forge-btn-embers .f11 { left: 73%; --dx: -3px; animation-duration: 4.5s; animation-delay: -3.0s; }
+.forge-btn-embers .f12 { left: 80%; --dx: 3px;  animation-duration: 3.8s; animation-delay: -0.9s; }
+.forge-btn-embers .f13 { left: 87%; --dx: -5px; animation-duration: 4.0s; animation-delay: -2.3s; }
+.forge-btn-embers .f14 { left: 92%; --dx: 4px;  animation-duration: 3.3s; animation-delay: -1.6s; }
+.forge-btn-embers .f15 { left: 97%; --dx: -2px; animation-duration: 4.3s; animation-delay: -0.3s; }
+.forge-btn-embers .f16 { left: 6%;  --dx: 5px;  animation-duration: 3.6s; animation-delay: -3.5s; }
+@keyframes forge-btn-ember-rise {
+  0%   { transform: translate(0, 0) scale(1);               opacity: 0; }
+  8%   { opacity: 1; }
+  55%  { opacity: 0.5; }
+  100% { transform: translate(var(--dx), -30px) scale(0.25); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .randomize-btn::before { display: none; }
   .randomize-bolt { transition: none; }
+  .forge-btn-embers { display: none; }
+  .forge-btn-glow { animation: none; opacity: 0.7; }
 }
 
 .preview-pane {
