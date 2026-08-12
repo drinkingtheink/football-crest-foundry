@@ -29,6 +29,29 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
           <p class="about-byline">A project by <a href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">Jason M Harrison</a></p>
 
           <div class="about-section">
+            <h3 class="about-heading">Exports</h3>
+            <p class="about-text">
+              Every crest exports <strong>print- &amp; merch-ready</strong> — take it straight to a
+              sticker, patch, or apparel shop, no design round-trip.
+            </p>
+            <p class="about-text" style="margin-top: 8px;">
+              <strong>PNG</strong> — transparent, high-resolution (~1600×1920, roughly 5×6″ at
+              300&nbsp;DPI). Great for stickers, patches, and small apparel prints.
+            </p>
+            <p class="about-text" style="margin-top: 8px;">
+              <strong>SVG</strong> — vector with all text converted to outlines, so it needs no
+              fonts and scales to any size. Exactly what a print shop or vinyl cutter wants.
+            </p>
+            <p class="about-text" style="margin-top: 8px;">
+              <strong>Copy</strong> — the same clean, transparent PNG straight to your clipboard,
+              ready to paste anywhere.
+            </p>
+            <p class="about-text" style="margin-top: 8px;">
+              <a href="/print.html" target="_blank" rel="noopener">→ How to print your crest</a>
+            </p>
+          </div>
+
+          <div class="about-section">
             <h3 class="about-heading">Credits</h3>
             <p class="about-text">
               Many heraldic symbols come from
@@ -247,6 +270,8 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
 }
 .about-byline a:hover { border-bottom-color: var(--accent-teal); }
 
+.about-section + .about-section { margin-top: 24px; }
+
 .about-heading {
   margin: 0 0 6px;
   font-size: 11px;
@@ -262,6 +287,7 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
   line-height: 1.6;
   color: #b9b6b6;
 }
+.about-text strong { color: #e8e8ec; font-weight: 600; }
 
 .about-text a {
   color: #e8c84a;

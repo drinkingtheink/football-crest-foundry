@@ -1313,7 +1313,7 @@ function stepBg(dir) {
             </button>
           </div>
 
-          <p class="print-hint hud-pill">✦ Every export is print- &amp; merch-ready — take your PNG or SVG straight to a sticker or apparel shop.</p>
+          <p class="print-hint hud-pill">✦ Every export is print- &amp; merch-ready — take your PNG or SVG straight to a sticker or apparel shop. <a href="/print.html" target="_blank" rel="noopener">How to print →</a></p>
 
           <Transition name="scene-fade">
           <div v-show="showScene" class="scene-controls">
@@ -2495,6 +2495,8 @@ function stepBg(dir) {
   text-align: center;
 }
 .print-hint { font-size: 11.5px; color: #cbb37a; margin: 0; text-align: center; max-width: 520px; }
+.print-hint a { color: #e8c84a; text-decoration: none; border-bottom: 1px solid rgba(232, 200, 74, 0.4); white-space: nowrap; }
+.print-hint a:hover { border-bottom-color: #e8c84a; }
 
 .app-overlay {
   position: fixed;

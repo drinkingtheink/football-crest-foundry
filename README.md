@@ -143,6 +143,8 @@ Both downloaded files are named `crest-foundry-<club-name>.<ext>`.
 
 **Auto-fit frame** — if a symbol or text element is placed outside the 200×240 badge bounds, the export **expands its frame** (viewBox + canvas) to include everything with a small margin, so nothing is clipped (PNG) or left off the artboard (SVG). Designs that stay within bounds export at the usual 200×240.
 
+**End-user guide** — a plain-language [**How to Print Your Crest**](public/print.html) page (`public/print.html`, linked from the in-app About panel and toolbar hint) walks non-technical users through picking a format and handing files to a sticker/apparel/vinyl shop.
+
 **How it works & gotchas learned**
 
 - **Fonts in exports:** a standalone SVG (rasterized via `<img>` for PNG, or opened as a file) does **not** inherit the page's web fonts. PNG embeds each used font as a subsetted base64 `@font-face`; SVG outlines the glyphs instead (via [opentype.js](https://github.com/opentypejs/opentype.js), lazy-loaded only on export).
