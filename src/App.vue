@@ -101,10 +101,13 @@ const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 }
 // SVG's intrinsic render size (not a CSS transform scale) so it stays vector-crisp
 // instead of upscaling a cached/composited bitmap of the badge-tilt layer.
 const CREST_BASE_SIZE = 380
+const CREST_SHORT_SCALE = 0.9   // zoom out 10% on short (laptop) viewports so the whole stack fits
+const shortViewport = ref(false)
+const crestBaseSize = computed(() => shortViewport.value ? Math.round(CREST_BASE_SIZE * CREST_SHORT_SCALE) : CREST_BASE_SIZE)
 const crestZoom = ref(1)
 const CREST_ZOOM_MIN = 1
 const CREST_ZOOM_MAX = 2.25
-const crestRenderSize = computed(() => Math.round(CREST_BASE_SIZE * crestZoom.value))
+const crestRenderSize = computed(() => Math.round(crestBaseSize.value * crestZoom.value))
 
 const activeClub = ref(initialClub)
 // True while showing an unedited curated crest from the library (drives the badge).
@@ -920,6 +923,8 @@ function onDocumentClick(e) {
 // forging a fresh one every few seconds (skipped under reduced motion).
 let mobileForgeTimer = null
 let mobileMql = null
+let shortMql = null
+function updateShortViewport() { shortViewport.value = !!shortMql?.matches }
 function updateMobileForge() {
   clearInterval(mobileForgeTimer)
   mobileForgeTimer = null
@@ -935,6 +940,9 @@ onMounted(() => {
   mobileMql = window.matchMedia('(max-width: 768px)')
   mobileMql.addEventListener('change', updateMobileForge)
   updateMobileForge()
+  shortMql = window.matchMedia('(max-height: 860px)')
+  shortMql.addEventListener('change', updateShortViewport)
+  updateShortViewport()
   nextTick(() => {
     sizeCanvas()
     if (particleCanvas.value) {
@@ -950,6 +958,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', sizeCanvas)
   document.removeEventListener('click', onDocumentClick)
   mobileMql?.removeEventListener('change', updateMobileForge)
+  shortMql?.removeEventListener('change', updateShortViewport)
   clearInterval(mobileForgeTimer)
   clearTimeout(sessionTimer)
   clearTimeout(emberTimer)
@@ -1438,7 +1447,7 @@ function stepBg(dir) {
 
         <div class="forge-block">
         <button class="randomize-btn" title="Forge a new crest" @click="randomizeAll">
-          <svg class="randomize-bolt" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z" fill="var(--accent-warm)"/></svg>
+          <svg class="randomize-bolt" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z"/></svg>
           <span class="randomize-label">Forge Random Crest</span>
         </button>
 
@@ -2207,12 +2216,11 @@ function stepBg(dir) {
   position: relative;
 }
 
-/* On short screens the vertically-centred stack squeezes the scene / background
-   controls against the bottom edge. Top-align and trim spacing so the crest
-   rides up and leaves room for the background options below it. */
+/* On short (laptop) screens the crest is zoomed out 10% (see CREST_SHORT_SCALE)
+   so the whole stack fits while staying vertically centred — rather than shoving
+   the crest up. Spacing is trimmed a touch to leave room for the controls below. */
 @media (max-height: 860px) {
   .preview-pane {
-    justify-content: flex-start;
     gap: 12px;
     padding: 28px 40px 20px;
   }
