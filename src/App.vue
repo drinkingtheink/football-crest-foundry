@@ -513,6 +513,31 @@ function stopWelding() {
   if (weldRaf) { cancelAnimationFrame(weldRaf); weldRaf = null }
 }
 
+// A one-shot weld lap fired by an action (export / copy / share) — a flourish
+// of sparks around the outline. Runs on its own rAF so it never interferes with
+// the idle-hover weld state machine.
+let weldPulseRaf = null
+let weldPulsePhase = 0
+let weldPulseLastT = 0
+function weldPulseTick(now) {
+  const comp = badgeComposerRef.value
+  const canvas = weldCanvas.value
+  if (!comp?.outlinePointAt || !canvas || !weldField) { weldPulseRaf = null; return }
+  const dt = Math.min(64, now - weldPulseLastT); weldPulseLastT = now
+  weldPulsePhase += dt / WELD_LAP_MS
+  const r = canvas.getBoundingClientRect()
+  const p = comp.outlinePointAt(weldPulsePhase)
+  if (p) weldField.weld(p.x - r.left, p.y - r.top, p.nx, p.ny, p.tx, p.ty, WELD_EMIT)
+  if (weldPulsePhase >= 1) { weldPulseRaf = null; return }
+  weldPulseRaf = requestAnimationFrame(weldPulseTick)
+}
+function pulseWeld() {
+  if (reduceMotion || !weldField || !badgeComposerRef.value?.outlinePointAt || !weldCanvas.value) return
+  weldPulsePhase = 0
+  weldPulseLastT = performance.now()
+  if (!weldPulseRaf) weldPulseRaf = requestAnimationFrame(weldPulseTick)
+}
+
 function evalWeld() {
   if (overCrest.value && crestIdle() && !reduceMotion) {
     if (welding.value) return
@@ -1064,11 +1089,18 @@ async function handleAccountClick() {
 // Toolbar Share: links are backed by a cloud design, so a crest must be signed
 // in + saved before it can be shared. Route the user to whichever step is next.
 function requestShare() {
+  // Uploaded "My Symbol" art is unmoderated user content; sharing would publish
+  // it to anyone with the link. Block it until UGC moderation exists.
+  if (config.symbols.some(s => s.customPaths)) {
+    addToast('Crests with an uploaded “My Symbol” can’t be shared yet. Remove it or swap in a built-in symbol to share.', { type: 'tip', duration: 5500 })
+    return
+  }
   if (!isSupabaseConfigured || !isSignedIn.value) {
     addToast('Sign in to share your crest with a link.', { type: 'tip', duration: 4500 })
     showAuth.value = true
     return
   }
+  pulseWeld()
   const design = activeDesign.value
   if (design?.source === 'cloud') {
     doShareDesign(design)
@@ -1100,6 +1132,7 @@ async function exportCrest(format) {
   const svgEl = badgeComposerRef.value?.svgRootEl
   if (!svgEl || isExporting.value) return
   isExporting.value = true
+  pulseWeld()
   try {
     const opts = { texts: config.texts, filename: crestFilename(config.texts, format) }
     if (format === 'svg') await exportCrestSvg(svgEl, opts)
@@ -1124,6 +1157,7 @@ async function copyCrest() {
   const svgEl = badgeComposerRef.value?.svgRootEl
   if (!svgEl || isCopying.value) return
   isCopying.value = true
+  pulseWeld()
   try {
     await copyCrestPngToClipboard(svgEl, { texts: config.texts })
     addToast('Copied to clipboard', { type: 'tip', duration: 2500 })

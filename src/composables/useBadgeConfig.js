@@ -53,7 +53,7 @@ const DEFAULT_TEXT = () => ({
 
 // The two texts a fresh crest ships with: club name up top, monogram in the belly.
 const DEFAULT_TEXTS = () => [
-  { ...DEFAULT_TEXT(), id: 'club-name', content: 'CREST FOUNDRY', fontSize: 13, fontWeight: 'bold', letterSpacing: 2, x: 100, y: 55 },
+  { ...DEFAULT_TEXT(), id: 'club-name', content: 'CREST FOUNDRY', fontSize: 13, fontWeight: 'bold', letterSpacing: 2, x: 100, y: 39 },
   { ...DEFAULT_TEXT(), id: 'monogram', content: 'FC', fontSize: 22, fontWeight: 'bold', letterSpacing: 3, x: 100, y: 185 },
 ]
 
