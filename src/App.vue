@@ -1192,6 +1192,8 @@ function stepBg(dir) {
         <!-- Warm forge glow at the base of the stage (behind the badge, above the background) -->
         <div class="forge-glow" />
 
+        <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; ⌘C / ⌘V to copy &amp; paste &nbsp;·&nbsp; Space to forge &nbsp;·&nbsp; ⌘S to snapshot</p>
+
         <!-- Curated crest badge — shown when a library crest was forged -->
         <Transition name="curated-fade">
           <div v-if="isCurated" class="curated-badge" title="A curated crest from the library">
@@ -2481,7 +2483,17 @@ function stepBg(dir) {
   gap: 8px;
 }
 
-.drag-hint { font-size: 12px; color: #b9b6b6; margin: 0; text-align: center; }
+.drag-hint {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  font-size: 12px;
+  color: #b9b6b6;
+  margin: 0;
+  text-align: center;
+}
 .print-hint { font-size: 11.5px; color: #cbb37a; margin: 0; text-align: center; max-width: 520px; }
 
 .app-overlay {
