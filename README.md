@@ -129,12 +129,17 @@ Build your crest on any of these 47 shield silhouettes — traditional heraldic 
 
 ## Export
 
-Two one-click downloads from the badge toolbar; both have a fully transparent background outside the shield.
+**Print- & merch-ready, instantly.** Every export leaves Crest Foundry ready to go straight to a sticker press, embroidery digitizer, or apparel printer — no design-shop round-trip, no missing-font surprises. Design it here, download it, hand it to a print or merch shop as-is.
 
-- **⬇ PNG** — high-resolution raster (~1600×1920). Fonts are embedded during rasterization, so text is always faithful.
-- **⬇ SVG** — a self-contained vector file with **all text converted to outlines** ("Create Outlines"). No fonts are required to open or print it anywhere — glyphs are real `<path>` geometry, so it drops cleanly into Illustrator, Inkscape, or a print RIP.
+Three one-click actions from the badge toolbar (PNG, SVG, and **⧉ Copy** to clipboard); all have a fully transparent background outside the shield.
 
-Both files are named `crest-foundry-<club-name>.<ext>`.
+- **⬇ PNG** — high-resolution raster (~1600×1920, transparent). At 300 DPI that's roughly a 5×6″ print — ideal for **die-cut stickers, patches, and small apparel prints**. Fonts are embedded during rasterization, so text is always faithful.
+- **⬇ SVG** — a self-contained vector file with **all text converted to outlines** ("Create Outlines"). No fonts are required to open or print it anywhere — glyphs are real `<path>` geometry, so it scales to any size and drops cleanly into Illustrator, Inkscape, or a print RIP. This is exactly the format a **print shop, vinyl cutter, or merch service** wants.
+- **⧉ Copy** — the same clean, transparent PNG straight to your clipboard, ready to paste into Slack, a doc, or a merch-shop upload form.
+
+Both downloaded files are named `crest-foundry-<club-name>.<ext>`.
+
+**Handing it to a print/merch shop:** send the **SVG** for anything that needs to scale (banners, large apparel, vinyl/die-cut) — it's resolution-independent with no font dependencies. Send the **PNG** for quick sticker/patch runs or any service that only accepts raster. Because backgrounds are transparent, the crest drops onto shirts, mugs, and sticker stock without a white box around it.
 
 **Auto-fit frame** — if a symbol or text element is placed outside the 200×240 badge bounds, the export **expands its frame** (viewBox + canvas) to include everything with a small margin, so nothing is clipped (PNG) or left off the artboard (SVG). Designs that stay within bounds export at the usual 200×240.
 
@@ -153,7 +158,7 @@ Both files are named `crest-foundry-<club-name>.<ext>`.
 
 Sign-in is **optional** — the app is fully usable anonymously, with designs kept in the browser. Signing in unlocks cloud save and cross-device sync.
 
-- **Passwordless auth** — **Continue with Google** (OAuth) or an **email magic link**, handled by [Supabase Auth](https://supabase.com/auth). No passwords stored.
+- **Passwordless auth** — social sign-in with **Google, GitHub, Discord, or Slack** (OAuth), or an **email magic link**, all handled by [Supabase Auth](https://supabase.com/auth). No passwords stored.
 - **Cloud designs** — saved crests live in a Postgres `designs` table, guarded by **Row-Level Security** so you only ever see your own.
 - **One-time import** — the first time you sign in, any designs saved locally in that browser are migrated into your account (idempotent — no duplicates on re-runs).
 - **Graceful degradation** — with no Supabase config present, the app silently falls back to local-only mode.

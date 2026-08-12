@@ -1104,7 +1104,10 @@ async function exportCrest(format) {
     const opts = { texts: config.texts, filename: crestFilename(config.texts, format) }
     if (format === 'svg') await exportCrestSvg(svgEl, opts)
     else await exportCrestPng(svgEl, opts)
-    addToast(`${format.toUpperCase()} exported`, { type: 'tip', duration: 2500 })
+    const msg = format === 'svg'
+      ? 'SVG saved — vector, fonts outlined. Ready for any print or merch shop.'
+      : 'PNG saved — transparent & print-ready. Straight to stickers or merch.'
+    addToast(msg, { type: 'tip', duration: 3400 })
   } catch (e) {
     addToast('Export failed — please try again', { type: 'tip', duration: 4000 })
   } finally {
@@ -1291,10 +1294,10 @@ function stepBg(dir) {
             <button class="swap-colors-btn" @click="randomizeColors" title="Recast the palette">
               ⇄ Recast
             </button>
-            <button class="export-png-btn" :disabled="isExporting" @click="exportPng" title="Download this crest as a transparent PNG">
+            <button class="export-png-btn" :disabled="isExporting" @click="exportPng" title="Download a transparent, print-ready PNG — perfect for stickers & merch">
               {{ isExporting ? '…' : '⬇ PNG' }}
             </button>
-            <button class="export-png-btn" :disabled="isExporting" @click="exportSvg" title="Download this crest as a self-contained SVG">
+            <button class="export-png-btn" :disabled="isExporting" @click="exportSvg" title="Download a self-contained vector SVG (fonts outlined) — drops straight into any print or merch shop">
               {{ isExporting ? '…' : '⬇ SVG' }}
             </button>
             <button v-if="canCopyImage" class="export-png-btn" :disabled="isCopying" @click="copyCrest" title="Copy this crest to the clipboard as a PNG">
@@ -1308,10 +1311,10 @@ function stepBg(dir) {
             </button>
           </div>
 
+          <p class="print-hint hud-pill">✦ Every export is print- &amp; merch-ready — take your PNG or SVG straight to a sticker or apparel shop.</p>
+
           <Transition name="scene-fade">
           <div v-show="showScene" class="scene-controls">
-            <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; ⌘C / ⌘V to copy &amp; paste &nbsp;·&nbsp; Space to forge &nbsp;·&nbsp; ⌘S to snapshot</p>
-
             <div class="bg-picker hud-pill">
               <button
                 v-for="opt in bgOptions"
@@ -2479,6 +2482,7 @@ function stepBg(dir) {
 }
 
 .drag-hint { font-size: 12px; color: #b9b6b6; margin: 0; text-align: center; }
+.print-hint { font-size: 11.5px; color: #cbb37a; margin: 0; text-align: center; max-width: 520px; }
 
 .app-overlay {
   position: fixed;
