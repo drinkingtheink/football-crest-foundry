@@ -182,10 +182,12 @@ const outsidePromptedId = ref(null)
 // ── Alignment guides (show-only, badge centre) ─────────────────────────────
 const BADGE_CX = VIEWBOX_W / 2
 const BADGE_CY = VIEWBOX_H / 2
-const GUIDE_TOL = 2                 // viewBox units the centre must be within
-const guides = ref({ x: false, y: false })
+const GUIDE_TOL = 2                 // viewBox units the centre must be within to "snap"
+const guides = ref({ x: false, y: false })   // true = centred on that axis (bright)
+const guidesActive = ref(false)              // true for the whole position drag (faint lines)
 
 function updateGuides(cx, cy) {
+  guidesActive.value = true
   guides.value = {
     x: Math.abs(cx - BADGE_CX) <= GUIDE_TOL,
     y: Math.abs(cy - BADGE_CY) <= GUIDE_TOL,
@@ -390,6 +392,7 @@ function stopDrag() {
   }
   drag.value = null
   guides.value = { x: false, y: false }
+  guidesActive.value = false
 }
 
 // Leaving the stage: end any drag and drop all hover state/tooltips so nothing
@@ -937,10 +940,10 @@ const gradLine = computed(() => {
       <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="7" font-family="system-ui,sans-serif" font-weight="600">{{ sizeHint.size }}px</text>
     </g>
 
-    <!-- Alignment guides (shown while dragging near badge centre) -->
-    <g style="pointer-events:none" data-export-hide>
-      <line v-if="guides.x" :x1="BADGE_CX" y1="-8" :x2="BADGE_CX" :y2="VIEWBOX_H + 8" class="align-guide" />
-      <line v-if="guides.y" x1="-8" :y1="BADGE_CY" :x2="VIEWBOX_W + 8" :y2="BADGE_CY" class="align-guide" />
+    <!-- Alignment guides: faint centre lines the whole drag, bright when centred -->
+    <g v-if="guidesActive" style="pointer-events:none" data-export-hide>
+      <line :x1="BADGE_CX" y1="-8" :x2="BADGE_CX" :y2="VIEWBOX_H + 8" class="align-guide" :class="{ snapped: guides.x }" />
+      <line x1="-8" :y1="BADGE_CY" :x2="VIEWBOX_W + 8" :y2="BADGE_CY" class="align-guide" :class="{ snapped: guides.y }" />
     </g>
   </svg>
 
@@ -967,8 +970,13 @@ const gradLine = computed(() => {
 
 .align-guide {
   stroke: #00e5ff;
-  stroke-width: 0.75;
+  stroke-width: 0.6;
   stroke-dasharray: 4 3;
+  opacity: 0.22;
+  transition: opacity 0.12s ease, stroke-width 0.12s ease;
+}
+.align-guide.snapped {
+  stroke-width: 0.75;
   opacity: 0.95;
   filter: drop-shadow(0 0 2px #00e5ff) drop-shadow(0 0 5px rgba(0, 229, 255, 0.7));
 }
