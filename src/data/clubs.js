@@ -355,33 +355,6 @@ export const clubs = [
     ]
   },
   {
-    "id": "chelsea",
-    "name": "Chelsea",
-    "sport": "Soccer",
-    "colors": [
-      {
-        "name": "Blue",
-        "hex": "#034694"
-      },
-      {
-        "name": "Red",
-        "hex": "#EE242C"
-      },
-      {
-        "name": "Gold",
-        "hex": "#DBA111"
-      },
-      {
-        "name": "Light Blue",
-        "hex": "#6A7AB5"
-      },
-      {
-        "name": "Gray",
-        "hex": "#D1D3D4"
-      }
-    ]
-  },
-  {
     "id": "chicago-fire",
     "name": "Chicago Fire",
     "sport": "Soccer",
@@ -1817,8 +1790,8 @@ export const clubs = [
     ]
   },
   {
-    "id": "cleveland-indians",
-    "name": "Cleveland Indians",
+    "id": "cleveland-guardians",
+    "name": "Cleveland Guardians",
     "sport": "Baseball",
     "colors": [
       {
@@ -2209,33 +2182,6 @@ export const clubs = [
       {
         "name": "Yellow",
         "hex": "#C4D600"
-      },
-      {
-        "name": "Navy",
-        "hex": "#061922"
-      }
-    ]
-  },
-  {
-    "id": "boston-celtics",
-    "name": "Boston Celtics",
-    "sport": "Basketball",
-    "colors": [
-      {
-        "name": "Forest Green",
-        "hex": "#008348"
-      },
-      {
-        "name": "Gold",
-        "hex": "#BB9753"
-      },
-      {
-        "name": "Brown",
-        "hex": "#A73832"
-      },
-      {
-        "name": "Tan",
-        "hex": "#FAB383"
       },
       {
         "name": "Navy",
@@ -3574,41 +3520,6 @@ export const clubs = [
       {
         "name": "Crimson",
         "hex": "#C8102E"
-      }
-    ]
-  },
-  {
-    "id": "chicago-blackhawks",
-    "name": "Chicago Blackhawks",
-    "sport": "Hockey",
-    "colors": [
-      {
-        "name": "Black",
-        "hex": "#010101"
-      },
-      {
-        "name": "Orange",
-        "hex": "#FF671F"
-      },
-      {
-        "name": "Yellow",
-        "hex": "#FFD100"
-      },
-      {
-        "name": "Navy",
-        "hex": "#001871"
-      },
-      {
-        "name": "Crimson",
-        "hex": "#C8102E"
-      },
-      {
-        "name": "Forest Green",
-        "hex": "#00843D"
-      },
-      {
-        "name": "Burnt Orange",
-        "hex": "#CC8A00"
       }
     ]
   },
