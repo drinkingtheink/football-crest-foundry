@@ -2191,6 +2191,7 @@ function stepBg(dir) {
 }
 .randomize-bolt {
   display: inline-block;
+  fill: var(--accent-warm);
   filter: drop-shadow(0 0 4px var(--accent-warm-soft));
   transition: transform 0.2s, filter 0.2s;
 }
