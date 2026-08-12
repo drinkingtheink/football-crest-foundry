@@ -5,13 +5,14 @@ import { useAuth } from '../composables/useAuth.js'
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close'])
 
-const { signInWithEmail, signInWithGoogle, signInWithGitHub, signInWithDiscord } = useAuth()
+const { signInWithEmail, signInWithGoogle, signInWithGitHub, signInWithDiscord, signInWithSlack } = useAuth()
 
 const email = ref('')
 const sending = ref(false)
 const googling = ref(false)
 const githubbing = ref(false)
 const discording = ref(false)
+const slacking = ref(false)
 const sent = ref(false)
 const errorMsg = ref('')
 const fieldRef = ref(null)
@@ -59,6 +60,18 @@ async function discord() {
   } catch (e) {
     errorMsg.value = e?.message || 'Could not start Discord sign-in.'
     discording.value = false
+  }
+}
+
+async function slack() {
+  if (slacking.value) return
+  slacking.value = true
+  errorMsg.value = ''
+  try {
+    await signInWithSlack()   // redirects away on success
+  } catch (e) {
+    errorMsg.value = e?.message || 'Could not start Slack sign-in.'
+    slacking.value = false
   }
 }
 
@@ -122,6 +135,16 @@ async function submit() {
                 <path fill="currentColor" d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.001.02.017.033a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041q.363.7.818 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .017-.033c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
               </svg>
               {{ discording ? 'Redirecting…' : 'Continue with Discord' }}
+            </button>
+
+            <button class="auth-slack" :disabled="slacking" @click="slack">
+              <svg class="sl-logo" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+                <path fill="#E01E5A" d="M3.362 10.11a1.68 1.68 0 0 1-1.681 1.68A1.68 1.68 0 0 1 0 10.11a1.68 1.68 0 0 1 1.681-1.68h1.681zm.846 0a1.68 1.68 0 0 1 1.681-1.68 1.68 1.68 0 0 1 1.681 1.68v4.21A1.68 1.68 0 0 1 5.889 16a1.68 1.68 0 0 1-1.681-1.68z"/>
+                <path fill="#36C5F0" d="M5.889 3.362a1.68 1.68 0 0 1-1.681-1.681A1.68 1.68 0 0 1 5.889 0a1.68 1.68 0 0 1 1.681 1.681v1.681zm0 .846a1.68 1.68 0 0 1 1.681 1.681 1.68 1.68 0 0 1-1.681 1.681h-4.21A1.68 1.68 0 0 1 0 5.889a1.68 1.68 0 0 1 1.68-1.681z"/>
+                <path fill="#2EB67D" d="M12.638 5.889a1.68 1.68 0 0 1 1.681-1.681A1.68 1.68 0 0 1 16 5.889a1.68 1.68 0 0 1-1.681 1.681h-1.681zm-.846 0a1.68 1.68 0 0 1-1.681 1.681 1.68 1.68 0 0 1-1.681-1.681v-4.21A1.68 1.68 0 0 1 10.111 0a1.68 1.68 0 0 1 1.681 1.681z"/>
+                <path fill="#ECB22E" d="M10.111 12.638a1.68 1.68 0 0 1 1.681 1.681A1.68 1.68 0 0 1 10.111 16a1.68 1.68 0 0 1-1.681-1.681v-1.681zm0-.846a1.68 1.68 0 0 1-1.681-1.681 1.68 1.68 0 0 1 1.681-1.681h4.21A1.68 1.68 0 0 1 16 10.111a1.68 1.68 0 0 1-1.681 1.681z"/>
+              </svg>
+              {{ slacking ? 'Redirecting…' : 'Continue with Slack' }}
             </button>
 
             <div class="auth-divider"><span>or</span></div>
@@ -265,6 +288,27 @@ async function submit() {
 .auth-discord:hover { opacity: 0.92; }
 .auth-discord:disabled { opacity: 0.6; cursor: default; }
 .dc-logo { flex-shrink: 0; }
+
+.auth-slack {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 8px;
+  background: #fff;
+  border: none;
+  border-radius: 6px;
+  color: #1f1f1f;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.auth-slack:hover { opacity: 0.92; }
+.auth-slack:disabled { opacity: 0.6; cursor: default; }
+.sl-logo { flex-shrink: 0; }
 
 .auth-divider {
   display: flex;

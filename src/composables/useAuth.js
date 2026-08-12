@@ -63,6 +63,16 @@ export function useAuth() {
     // On success the browser redirects to Discord; nothing more runs here.
   }
 
+  async function signInWithSlack() {
+    if (!isSupabaseConfigured) throw new Error('Cloud sync is not configured.')
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'slack_oidc',
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) throw error
+    // On success the browser redirects to Slack; nothing more runs here.
+  }
+
   async function signOut() {
     if (!isSupabaseConfigured) return
     await supabase.auth.signOut()
@@ -71,6 +81,6 @@ export function useAuth() {
 
   return {
     user, email, isSignedIn, ready, isSupabaseConfigured,
-    signInWithEmail, signInWithGoogle, signInWithGitHub, signInWithDiscord, signOut,
+    signInWithEmail, signInWithGoogle, signInWithGitHub, signInWithDiscord, signInWithSlack, signOut,
   }
 }
