@@ -114,7 +114,8 @@ async function submit() {
 
           <template v-else>
             <p class="auth-text">
-              Save your crests to the Great Foundry in the Sky and sync them across devices.
+              Save your crests to the Great Foundry in the Sky, sync them across devices,
+              and share them with anyone.
             </p>
 
             <button class="auth-google" :disabled="googling" @click="google">
