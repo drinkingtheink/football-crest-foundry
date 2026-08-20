@@ -1039,7 +1039,19 @@ const { isSignedIn, email: authEmail, signOut, isSupabaseConfigured } = useAuth(
 const ONBOARDED_KEY = 'crest-foundry:onboarded'
 const showWelcome = ref(false)
 const symbolsDemo = ref(false)
-function onTourStep(target) { symbolsDemo.value = target === 'symbols' }
+// While the tour showcases the Placed Symbols panel, keep the first symbol
+// selected so its expanded controls are on display; deselect when we move on.
+let tourSelectedForStep = false
+function onTourStep(target) {
+  symbolsDemo.value = target === 'symbols'
+  if (target === 'placed' && config.symbols.length) {
+    selectSymbol(config.symbols[0].instanceId)
+    tourSelectedForStep = true
+  } else if (tourSelectedForStep) {
+    deselectAll()
+    tourSelectedForStep = false
+  }
+}
 const tourSteps = [
   {
     logo: true,
@@ -1075,6 +1087,12 @@ const tourSteps = [
     placement: 'left',
     title: 'Add Heraldic Symbols',
     body: 'Drop in <strong>symbols</strong> from the gallery — lions, crowns, stars, and hundreds more. Add as many as you like, then drag them onto the crest.',
+  },
+  {
+    target: 'placed',
+    placement: 'left',
+    title: 'Tune Each Symbol',
+    body: 'Select a placed symbol to fine-tune it — <strong>color</strong>, <strong>size</strong>, <strong>rotation</strong>, <strong>flip</strong>, bounds, and an <strong>outline</strong>.',
   },
   {
     target: 'export',
@@ -1698,7 +1716,7 @@ function stepBg(dir) {
         </div>
 
         <!-- Placed Symbols -->
-        <div v-if="config.symbols.length" class="control-group">
+        <div v-if="config.symbols.length" class="control-group" data-tour="placed">
           <h3 class="control-label">Placed Symbols</h3>
           <div class="symbol-list">
             <div

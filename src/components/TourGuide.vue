@@ -125,7 +125,12 @@ watch(() => props.open, (v) => {
   }
 })
 
-watch(stepIndex, () => nextTick(measure))
+watch(stepIndex, () => {
+  nextTick(measure)
+  // Re-measure after any async expansion / smooth-scroll settles (e.g. the
+  // Placed Symbols row expanding when the tour selects a symbol).
+  setTimeout(measure, 320)
+})
 watch(() => current.value?.target, (t) => emit('step', t ?? null))
 
 onBeforeUnmount(unbind)
