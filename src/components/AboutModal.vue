@@ -2,7 +2,7 @@
 import LogoMark from './LogoMark.vue'
 
 defineProps({ open: Boolean })
-defineEmits(['close'])
+defineEmits(['close', 'replay-tour'])
 
 const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucasms', 'sbed', 'skoll', 'sparker', 'various-artists']
 </script>
@@ -71,6 +71,10 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
               <a href="https://opensource.org/license/mit" target="_blank" rel="noopener">MIT</a>.
             </p>
           </div>
+
+          <p class="about-replay">
+            <button class="replay-tour-btn" @click="$emit('replay-tour')">↺ Replay the welcome tour</button>
+          </p>
 
           <p class="about-legal">
             <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a>
@@ -295,6 +299,22 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
   border-bottom: 1px solid rgba(232, 200, 74, 0.35);
 }
 .about-text a:hover { border-bottom-color: #e8c84a; }
+
+.about-replay {
+  margin: 20px 0 0;
+  text-align: center;
+}
+.replay-tour-btn {
+  background: #1e1e28;
+  border: 1px solid #2a2a35;
+  border-radius: 6px;
+  color: #9a9aa8;
+  font-size: 12px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.replay-tour-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); }
 
 .about-legal {
   margin: 18px 0 0;
