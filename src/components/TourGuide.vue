@@ -6,7 +6,7 @@ const props = defineProps({
   open: Boolean,
   steps: { type: Array, default: () => [] },
 })
-const emit = defineEmits(['close', 'finish'])
+const emit = defineEmits(['close', 'finish', 'step'])
 
 const GAP = 16
 const PAD = 8
@@ -121,10 +121,12 @@ watch(() => props.open, (v) => {
     nextTick(measure)
   } else {
     unbind()
+    emit('step', null)
   }
 })
 
 watch(stepIndex, () => nextTick(measure))
+watch(() => current.value?.target, (t) => emit('step', t ?? null))
 
 onBeforeUnmount(unbind)
 </script>

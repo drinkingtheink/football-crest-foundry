@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import { icons, iconGroups, iconCats } from '../data/icons.js'
 
 const props = defineProps({
@@ -7,6 +7,9 @@ const props = defineProps({
   placedCounts: { type: Object, default: () => ({}) },
   // Gallery id of the selected canvas symbol; when set, scroll it into view
   selectedIconId: { type: String, default: null },
+  // While true (welcome-tour Symbols step), auto-cycle categories to showcase
+  // the range of symbols on offer.
+  demo: { type: Boolean, default: false },
 })
 const emit = defineEmits(["add-icon"])
 
@@ -30,6 +33,24 @@ watch(() => props.selectedIconId, async id => {
   flashId.value = id
   setTimeout(() => { if (flashId.value === id) flashId.value = null }, 1200)
 })
+
+// Welcome-tour showcase: cycle a curated set of visually distinct categories so
+// a new user sees the breadth of symbols at a glance. Only runs while `demo` is on.
+const DEMO_GROUPS = ['All', 'Beasts', 'Crowns', 'Crosses', 'Celestial', 'Heraldic', 'Weapons', 'Flora', 'Sport']
+let demoTimer = null
+function stopDemo() { clearInterval(demoTimer); demoTimer = null }
+watch(() => props.demo, on => {
+  stopDemo()
+  if (!on) { activeGroup.value = 'All'; return }
+  search.value = ''
+  let i = 0
+  activeGroup.value = DEMO_GROUPS[0]
+  demoTimer = setInterval(() => {
+    i = (i + 1) % DEMO_GROUPS.length
+    activeGroup.value = DEMO_GROUPS[i]
+  }, 850)
+})
+onBeforeUnmount(stopDemo)
 
 // Tooltip teleported to <body> and fixed to the viewport, so it isn't clipped
 // by the scrollable icon grid (overflow-y) — which cut off the top row's labels.

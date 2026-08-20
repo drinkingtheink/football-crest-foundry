@@ -1038,6 +1038,8 @@ const { isSignedIn, email: authEmail, signOut, isSupabaseConfigured } = useAuth(
 // --- First-run welcome tour ---
 const ONBOARDED_KEY = 'crest-foundry:onboarded'
 const showWelcome = ref(false)
+const symbolsDemo = ref(false)
+function onTourStep(target) { symbolsDemo.value = target === 'symbols' }
 const tourSteps = [
   {
     logo: true,
@@ -1686,7 +1688,7 @@ function stepBg(dir) {
         <!-- Symbol Gallery -->
         <div class="control-group" data-tour="symbols">
           <h3 class="control-label">Add Symbol</h3>
-          <IconPicker :placed-counts="placedIconCounts" :selected-icon-id="selectedIconId" @add-icon="onPickIcon" />
+          <IconPicker :placed-counts="placedIconCounts" :selected-icon-id="selectedIconId" :demo="symbolsDemo" @add-icon="onPickIcon" />
         </div>
 
         <!-- Custom (user-uploaded) symbols — own browse menu, flat list -->
@@ -1868,7 +1870,7 @@ function stepBg(dir) {
     />
     <AboutModal :open="showAbout" @close="showAbout = false" @replay-tour="replayTour" />
     <AuthModal :open="showAuth" @close="showAuth = false" />
-    <TourGuide :open="showWelcome" :steps="tourSteps" @close="finishTour" @finish="finishTour" />
+    <TourGuide :open="showWelcome" :steps="tourSteps" @close="finishTour" @finish="finishTour" @step="onTourStep" />
   </div>
 </template>
 
