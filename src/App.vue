@@ -988,7 +988,7 @@ function randomizeAll() {
   patternTone.value = patternTones[Math.floor(Math.random() * patternTones.length)]
 
   ;[...config.symbols].forEach(s => removeSymbol(s.instanceId))
-  if (Math.random() < 2/3) {
+  {
     addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
     // Random symbols always take the palette's 3rd colour as their fill, with a
     // contrasting stroke so the shape never disappears against it.
