@@ -12,6 +12,7 @@ import AppBackground from './components/AppBackground.vue'
 import SnapshotPanel from './components/SnapshotPanel.vue'
 import AboutModal from './components/AboutModal.vue'
 import AuthModal from './components/AuthModal.vue'
+import TourGuide from './components/TourGuide.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { useAuth } from './composables/useAuth.js'
 import { saveSnapshot, updateSnapshot, importLocalToCloud, shareDesign, unshareDesign, getSharedDesign } from './utils/snapshots.js'
@@ -682,7 +683,7 @@ const sharedTone    = ref(patternTones[Math.floor(Math.random() * patternTones.l
 const sharedOverlay = reactive({ color: '#000000', opacity: 0.7 })
 
 onMounted(async () => {
-  if (!sharedActive.value) { restoreSession(); return }
+  if (!sharedActive.value) { restoreSession(); maybeStartTour(); return }
   const token = new URLSearchParams(location.search).get('c')
   try {
     const d = await getSharedDesign(token)
@@ -1034,6 +1035,73 @@ const showAbout = ref(false)
 const showAuth = ref(false)
 const { isSignedIn, email: authEmail, signOut, isSupabaseConfigured } = useAuth()
 
+// --- First-run welcome tour ---
+const ONBOARDED_KEY = 'crest-foundry:onboarded'
+const showWelcome = ref(false)
+const tourSteps = [
+  {
+    title: 'Welcome to Crest Foundry',
+    body: 'Forge a crest for any club — football, scholastic, recreational, social, role-playing, and more. Let’s take a quick lap around the forge.',
+  },
+  {
+    target: 'forge',
+    placement: 'bottom',
+    title: 'Forge a Random Crest',
+    body: 'Stuck for ideas? Hit <strong>Forge Random Crest</strong> for an instant new design — shape, palette, and symbols all at once. (Tap <strong>Space</strong> anytime to reforge.)',
+  },
+  {
+    target: 'crest',
+    placement: 'left',
+    title: 'Make It Yours',
+    body: '<strong>Drag</strong> symbols and text right on the crest to arrange them. Arrow keys nudge; <strong>Shift+Arrow</strong> jumps 10px.',
+  },
+  {
+    target: 'colors',
+    placement: 'left',
+    title: 'Club Colors',
+    body: 'Pick a real club’s palette, or hit <strong>Recast Colors</strong> to roll a fresh one. Every color updates across the whole crest.',
+  },
+  {
+    target: 'shape',
+    placement: 'left',
+    title: 'Pick a Shield Shape',
+    body: 'Start with the <strong>silhouette</strong> — from a classic English shield to a rounded badge. It frames everything else.',
+  },
+  {
+    target: 'symbols',
+    placement: 'left',
+    title: 'Add Heraldic Symbols',
+    body: 'Drop in <strong>symbols</strong> from the gallery — lions, crowns, stars, and hundreds more. Add as many as you like, then drag them onto the crest.',
+  },
+  {
+    target: 'export',
+    placement: 'top',
+    title: 'Export, Print & Merch',
+    body: 'Download a transparent <strong>PNG</strong> or a vector <strong>SVG</strong> (fonts outlined) — both are <strong>print- &amp; merch-ready</strong> for stickers, patches, or apparel.',
+  },
+  {
+    target: 'account',
+    placement: 'bottom',
+    title: 'Save & Share',
+    body: 'Sign in to save your crests to the cloud, sync them across devices, and share them with a link. Ready? Let’s forge.',
+  },
+]
+
+function finishTour() {
+  showWelcome.value = false
+  try { localStorage.setItem(ONBOARDED_KEY, '1') } catch {}
+}
+function replayTour() {
+  showAbout.value = false
+  showWelcome.value = true
+}
+function maybeStartTour() {
+  let seen = false
+  try { seen = !!localStorage.getItem(ONBOARDED_KEY) } catch {}
+  if (seen) return
+  setTimeout(() => { showWelcome.value = true }, 650)
+}
+
 async function handleAccountClick() {
   if (isSignedIn.value) {
     await signOut()
@@ -1256,7 +1324,7 @@ function stepBg(dir) {
           @mousemove="onBadgeMove"
           @mouseleave="onBadgeLeave"
         >
-        <div ref="badgeWrap" :class="['badge-wrap', { pulsing: isPulsing }]">
+        <div ref="badgeWrap" data-tour="crest" :class="['badge-wrap', { pulsing: isPulsing }]">
           <BadgeComposer
             ref="badgeComposerRef"
             :config="config"
@@ -1280,7 +1348,7 @@ function stepBg(dir) {
         </div>
         </div>
         <div class="scene-wrap">
-          <div class="scene-actions">
+          <div class="scene-actions" data-tour="export">
             <button class="start-over-btn" @click="startOver" title="Clear the current design and start fresh">
               ↺ Reforge
             </button>
@@ -1384,6 +1452,7 @@ function stepBg(dir) {
           <div class="logo-actions">
             <button
               v-if="isSupabaseConfigured"
+              data-tour="account"
               class="account-btn"
               :class="{ 'is-in': isSignedIn }"
               :title="isSignedIn ? `Signed in as ${authEmail} — click to sign out` : 'Sign in to save crests to the cloud'"
@@ -1399,7 +1468,7 @@ function stepBg(dir) {
           <span class="forge-btn-embers" aria-hidden="true">
             <i class="fember f1" /><i class="fember f2" /><i class="fember f3" /><i class="fember f4" /><i class="fember f5" /><i class="fember f6" /><i class="fember f7" /><i class="fember f8" /><i class="fember f9" /><i class="fember f10" /><i class="fember f11" /><i class="fember f12" /><i class="fember f13" /><i class="fember f14" /><i class="fember f15" /><i class="fember f16" />
           </span>
-          <button class="randomize-btn" title="Forge a new crest" @click="randomizeAll">
+          <button class="randomize-btn" data-tour="forge" title="Forge a new crest" @click="randomizeAll">
             <svg class="randomize-bolt" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z"/></svg>
             <span class="randomize-label">Forge Random Crest</span>
           </button>
@@ -1421,7 +1490,7 @@ function stepBg(dir) {
         </div>
 
         <!-- Club Colors / Palette -->
-        <div class="control-group">
+        <div class="control-group" data-tour="colors">
           <h3 class="control-label">Club Colors</h3>
           <ClubPicker @apply="applyClub" />
           <button class="random-colors-btn" @click="randomizeColors" title="Recast with a random club's colors">⚡ Recast Colors</button>
@@ -1471,7 +1540,7 @@ function stepBg(dir) {
         </div>
 
         <!-- Shape -->
-        <div class="control-group" :class="{ 'group-disabled': config.noShield }">
+        <div class="control-group" data-tour="shape" :class="{ 'group-disabled': config.noShield }">
           <h3 class="control-label">Shape</h3>
           <div class="shape-grid">
             <button
@@ -1614,7 +1683,7 @@ function stepBg(dir) {
         </div>
 
         <!-- Symbol Gallery -->
-        <div class="control-group">
+        <div class="control-group" data-tour="symbols">
           <h3 class="control-label">Add Symbol</h3>
           <IconPicker :placed-counts="placedIconCounts" :selected-icon-id="selectedIconId" @add-icon="onPickIcon" />
         </div>
@@ -1796,8 +1865,9 @@ function stepBg(dir) {
       @close="shareModalOpen = false"
       @revoke="doRevokeShare"
     />
-    <AboutModal :open="showAbout" @close="showAbout = false" />
+    <AboutModal :open="showAbout" @close="showAbout = false" @replay-tour="replayTour" />
     <AuthModal :open="showAuth" @close="showAuth = false" />
+    <TourGuide :open="showWelcome" :steps="tourSteps" @close="finishTour" @finish="finishTour" />
   </div>
 </template>
 
