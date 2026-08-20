@@ -32,12 +32,23 @@ function scheduleMeasure() {
   })
 }
 
+// Re-fit the hole whenever the highlighted element changes size — e.g. the
+// Placed Symbols panel expanding when the tour selects a symbol.
+let sizeObserver = null
+function observe(el) {
+  if (sizeObserver) sizeObserver.disconnect()
+  if (!el || typeof ResizeObserver === 'undefined') { sizeObserver = null; return }
+  sizeObserver = new ResizeObserver(scheduleMeasure)
+  sizeObserver.observe(el)
+}
+
 async function measure() {
   viewport.value = { w: window.innerWidth, h: window.innerHeight }
   const step = current.value
-  if (!step?.target) { rect.value = null; return }
+  if (!step?.target) { rect.value = null; observe(null); return }
   const el = document.querySelector(`[data-tour="${step.target}"]`)
-  if (!el) { rect.value = null; return }
+  if (!el) { rect.value = null; observe(null); return }
+  observe(el)
   el.scrollIntoView({ block: 'center', inline: 'nearest' })
   await nextTick()
   const r = el.getBoundingClientRect()
@@ -112,6 +123,7 @@ function unbind() {
   window.removeEventListener('keydown', onKey)
   window.removeEventListener('resize', scheduleMeasure)
   window.removeEventListener('scroll', scheduleMeasure, true)
+  observe(null)
 }
 
 watch(() => props.open, (v) => {

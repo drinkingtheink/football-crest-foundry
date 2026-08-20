@@ -1091,8 +1091,8 @@ const tourSteps = [
   {
     target: 'placed',
     placement: 'left',
-    title: 'Tune Each Symbol',
-    body: 'Select a placed symbol to fine-tune it — <strong>color</strong>, <strong>size</strong>, <strong>rotation</strong>, <strong>flip</strong>, bounds, and an <strong>outline</strong>.',
+    title: 'Tune Symbols & Text',
+    body: 'Tune each symbol and text block — <strong>color</strong>, <strong>size</strong>, <strong>rotation</strong>, <strong>flip</strong>, bounds, and an <strong>outline</strong>. Select one to reveal its controls.',
   },
   {
     target: 'export',
