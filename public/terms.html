@@ -14,6 +14,27 @@
     }
     main { max-width: 680px; margin: 0 auto; }
     h1 { color: #e8c84a; font-size: 26px; margin: 0 0 4px; }
+    /* Foundry effect — embers drifting up off the heading */
+    .foundry-h1 { position: relative; display: inline-block; }
+    .ember {
+      position: absolute; top: 1px; width: 3px; height: 3px;
+      border-radius: 50%; background: #ffd98a;
+      box-shadow: 0 0 6px 1px rgba(255, 140, 40, 0.85);
+      opacity: 0; pointer-events: none;
+      animation: ember-rise 3.4s ease-out infinite;
+    }
+    .ember.e1 { left: 12%; --dx: -3px; animation-duration: 3.6s; animation-delay: -0.3s; }
+    .ember.e2 { left: 33%; --dx: 4px;  animation-duration: 4.4s; animation-delay: -1.7s; }
+    .ember.e3 { left: 52%; --dx: -2px; animation-duration: 3.9s; animation-delay: -2.9s; }
+    .ember.e4 { left: 71%; --dx: 5px;  animation-duration: 4.7s; animation-delay: -1.0s; }
+    .ember.e5 { left: 89%; --dx: -4px; animation-duration: 4.1s; animation-delay: -3.3s; }
+    @keyframes ember-rise {
+      0%   { transform: translate(0, 0) scale(1);              opacity: 0; }
+      8%   { opacity: 0.95; }
+      55%  { opacity: 0.5; }
+      100% { transform: translate(var(--dx), -26px) scale(0.35); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { .ember { display: none; } }
     .updated { color: #888; font-size: 13px; margin: 0 0 32px; }
     h2 { color: #e8d06a; font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; margin: 32px 0 8px; }
     p, li { color: #c9c7cc; }
@@ -26,7 +47,7 @@
 <body>
   <main>
     <a class="back" href="/">← Back to Crest Foundry</a>
-    <h1>Terms of Use</h1>
+    <h1><span class="foundry-h1">Terms of Use<i class="ember e1"></i><i class="ember e2"></i><i class="ember e3"></i><i class="ember e4"></i><i class="ember e5"></i></span></h1>
     <p class="updated">Last updated: 10 August 2026</p>
 
     <p>Crest Foundry ("the Service") is a free tool for designing and exporting club crests and badges. By using the Service, you agree to these Terms.</p>
