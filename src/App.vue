@@ -1040,6 +1040,7 @@ const ONBOARDED_KEY = 'crest-foundry:onboarded'
 const showWelcome = ref(false)
 const tourSteps = [
   {
+    logo: true,
     title: 'Welcome to Crest Foundry',
     body: 'Forge a crest for any club — football, scholastic, recreational, social, role-playing, and more. Let’s take a quick lap around the forge.',
   },

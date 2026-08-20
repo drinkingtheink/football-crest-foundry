@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
+import LogoMark from './LogoMark.vue'
 
 const props = defineProps({
   open: Boolean,
@@ -153,6 +154,8 @@ onBeforeUnmount(unbind)
 
           <button class="tour-close" title="Skip tour" @click="skip">×</button>
 
+          <LogoMark v-if="current?.logo" class="tour-logo" />
+
           <p class="tour-step-count">{{ stepIndex + 1 }} / {{ steps.length }}</p>
           <h2 class="tour-title"><span class="molten">{{ current?.title }}</span></h2>
           <p class="tour-body" v-html="current?.body" />
@@ -257,6 +260,14 @@ onBeforeUnmount(unbind)
   transition: border-color 0.15s, color 0.15s;
 }
 .tour-close:hover { border-color: #e05555; color: #e05555; }
+
+/* higher specificity so it beats LogoMark's own scoped width/height (38×43) */
+.tour-card .tour-logo {
+  display: flex;
+  width: 58px;
+  height: 66px;
+  margin: 2px auto 12px;
+}
 
 .tour-step-count {
   margin: 0 0 4px;
