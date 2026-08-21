@@ -1098,7 +1098,7 @@ const tourSteps = [
   {
     target: 'export',
     placement: 'top',
-    title: 'Export, Print & Merch',
+    title: 'Export Merch-Ready Files',
     body: 'Download a transparent <strong>PNG</strong> or a vector <strong>SVG</strong> (fonts outlined) — both are <strong>print- &amp; merch-ready</strong> for stickers, patches, or apparel.',
   },
   {
