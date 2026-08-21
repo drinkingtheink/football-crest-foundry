@@ -26,6 +26,7 @@ import { crestLibrary } from './data/crestLibrary.js'
 import { auroraBg, wavesBg, crisscrossBg, pinstripeBg, diamondsBg, dotsBg, gridBg, zigzagBg } from './utils/patterns.js'
 import { randomFonts, loadFont } from './utils/fonts.js'
 import { exportCrestPng, exportCrestSvg, crestFilename, copyCrestPngToClipboard, canCopyImageToClipboard } from './utils/exportBadge.js'
+import { track } from './utils/analytics.js'
 import { createSparkField } from './utils/particles.js'
 import { useToast } from './composables/useToast.js'
 
@@ -537,7 +538,7 @@ function onKeyDown(e) {
   }
 
   if (e.key === 'Escape') { deselectAll(); return }
-  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); randomizeAll(); return }
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); randomizeAll('keyboard'); return }
   if (e.key !== 'Delete' && e.key !== 'Backspace') return
   // copy the list first — removeSymbol/removeText mutate the selection
   ;[...selection.value].forEach(item => item.type === 'symbol' ? removeSymbol(item.id) : removeText(item.id))
@@ -596,6 +597,7 @@ async function doSaveSnapshot(name) {
   const svgEl = badgeWrap.value?.querySelector('svg')
   try {
     const saved = await saveSnapshot(name, config, svgEl)
+    track('save_crest', { destination: saved.source ?? 'local' })
     // A brand-new save becomes the active design — subsequent saves update it.
     activeDesign.value = { id: saved.id, name: saved.name, source: saved.source ?? 'local' }
     // Share → Save → Create link: if Share kicked off this save, open the link now.
@@ -646,6 +648,7 @@ async function doShareDesign(snap) {
   try {
     const { url } = await shareDesign(snap.id)
     shareUrl.value = url
+    track('share_crest')
   } catch (e) {
     shareModalOpen.value = false
     addToast('Couldn’t create a share link — please try again.', { type: 'error' })
@@ -951,10 +954,13 @@ function onSnapshotDeleted(id) {
 function startOver() {
   // "Start Over" forges a completely fresh random crest, just like Space / the
   // Forge button — not a reset to the static default.
-  randomizeAll()
+  randomizeAll('reforge')
 }
 
-function randomizeAll() {
+function randomizeAll(source) {
+  // `source` is set only for deliberate user forges (button/keyboard/reforge);
+  // the mobile-gate auto-forge loop calls with none, so it isn't tracked.
+  if (source) track('forge_crest', { method: source })
   // A forged crest is a new design, not an edit of whatever was loaded.
   activeDesign.value = null
   const leavingCurated = isCurated.value
@@ -1034,6 +1040,7 @@ function randomizeAll() {
 const showScene = ref(true)
 const showAbout = ref(false)
 const showAuth = ref(false)
+watch(showAuth, (v) => { if (v) track('sign_in_start') })
 const { isSignedIn, email: authEmail, signOut, isSupabaseConfigured } = useAuth()
 
 // --- First-run welcome tour ---
@@ -1184,6 +1191,7 @@ async function exportCrest(format) {
     const opts = { texts: config.texts, filename: crestFilename(config.texts, format) }
     if (format === 'svg') await exportCrestSvg(svgEl, opts)
     else await exportCrestPng(svgEl, opts)
+    track('export_crest', { format })
     const msg = format === 'svg'
       ? 'SVG saved — vector, fonts outlined. Ready for any print or merch shop.'
       : 'PNG saved — transparent & print-ready. Straight to stickers or merch.'
@@ -1207,6 +1215,7 @@ async function copyCrest() {
   pulseWeld()
   try {
     await copyCrestPngToClipboard(svgEl, { texts: config.texts })
+    track('copy_crest')
     addToast('Copied to clipboard', { type: 'tip', duration: 2500 })
   } catch (e) {
     addToast(e?.message || 'Copy failed — please try again', { type: 'tip', duration: 4000 })
@@ -1490,7 +1499,7 @@ function stepBg(dir) {
           <span class="forge-btn-embers" aria-hidden="true">
             <i class="fember f1" /><i class="fember f2" /><i class="fember f3" /><i class="fember f4" /><i class="fember f5" /><i class="fember f6" /><i class="fember f7" /><i class="fember f8" /><i class="fember f9" /><i class="fember f10" /><i class="fember f11" /><i class="fember f12" /><i class="fember f13" /><i class="fember f14" /><i class="fember f15" /><i class="fember f16" />
           </span>
-          <button class="randomize-btn" data-tour="forge" title="Forge a new crest" @click="randomizeAll">
+          <button class="randomize-btn" data-tour="forge" title="Forge a new crest" @click="randomizeAll('button')">
             <svg class="randomize-bolt" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M13 2 3 14h6l-1 8 10-12h-6z"/></svg>
             <span class="randomize-label">Forge Random Crest</span>
           </button>

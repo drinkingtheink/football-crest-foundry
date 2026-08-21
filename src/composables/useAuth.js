@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
+import { track } from '../utils/analytics.js'
 
 // Module-level singletons — every component shares one reactive session.
 const user = ref(null)
@@ -13,8 +14,13 @@ function init() {
     user.value = data.session?.user ?? null
     ready.value = true
   })
-  supabase.auth.onAuthStateChange((_event, session) => {
+  supabase.auth.onAuthStateChange((event, session) => {
     user.value = session?.user ?? null
+    // SIGNED_IN fires on a genuine login (incl. OAuth redirect back); restored
+    // sessions fire INITIAL_SESSION and token refreshes fire TOKEN_REFRESHED,
+    // so this counts real completions, not page loads.
+    if (event === 'SIGNED_IN') track('sign_in', { provider: session?.user?.app_metadata?.provider })
+    else if (event === 'SIGNED_OUT') track('sign_out')
   })
 }
 
