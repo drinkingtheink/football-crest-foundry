@@ -1,0 +1,17 @@
+{
+  "name": "Crest Foundry — Club Crest Creator",
+  "short_name": "Crest Foundry",
+  "description": "Design and export a custom crest for any club — combine shield shapes, heraldic symbols, background patterns, text, and borders, then export print- & merch-ready PNG or SVG.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f13",
+  "theme_color": "#0f0f13",
+  "icons": [
+    {
+      "src": "/crest-favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ]
+}

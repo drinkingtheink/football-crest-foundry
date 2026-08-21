@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://crest-foundry.jasonmharrison.info/sitemap.xml
