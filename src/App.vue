@@ -1057,7 +1057,7 @@ const tourSteps = [
   {
     logo: true,
     title: 'Welcome to Crest Foundry',
-    body: 'Forge a crest for any club — football, scholastic, recreational, social, role-playing, and more. Let’s take a quick lap around the foundry.',
+    body: 'Forge a crest for any club — football, scholastic, recreational, social, role-playing, and more. Let’s take a quick lap around the shop.',
   },
   {
     target: 'forge',
