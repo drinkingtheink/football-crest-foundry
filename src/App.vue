@@ -861,6 +861,7 @@ function onDocumentClick(e) {
   if (e.target.closest('svg')) return
   if (e.target.closest('.symbol-item, .text-item')) return
   if (e.target.closest('.fp-panel')) return // teleported font-picker panel — keep the text selected
+  if (e.target.closest('.tour-root')) return // welcome tour selects a symbol to show its controls — don't fight it
   deselectAll()
 }
 

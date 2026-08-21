@@ -32,28 +32,44 @@ function scheduleMeasure() {
   })
 }
 
+function currentEl() {
+  const t = current.value?.target
+  return t ? document.querySelector(`[data-tour="${t}"]`) : null
+}
+
 // Re-fit the hole whenever the highlighted element changes size — e.g. the
-// Placed Symbols panel expanding when the tour selects a symbol.
+// Placed Symbols panel expanding when the tour selects a symbol. Observe the
+// element only once (guarded on identity) so measure() doesn't thrash.
+let observedEl = null
 let sizeObserver = null
 function observe(el) {
+  if (el === observedEl) return
+  observedEl = el
   if (sizeObserver) sizeObserver.disconnect()
   if (!el || typeof ResizeObserver === 'undefined') { sizeObserver = null; return }
   sizeObserver = new ResizeObserver(scheduleMeasure)
   sizeObserver.observe(el)
 }
 
-async function measure() {
+// Read-only: just re-fit the hole to the current target. Does NOT scroll —
+// scrolling happens once per step in goToStep so re-measures don't thrash.
+function measure() {
   viewport.value = { w: window.innerWidth, h: window.innerHeight }
-  const step = current.value
-  if (!step?.target) { rect.value = null; observe(null); return }
-  const el = document.querySelector(`[data-tour="${step.target}"]`)
-  if (!el) { rect.value = null; observe(null); return }
+  const el = currentEl()
   observe(el)
-  el.scrollIntoView({ block: 'center', inline: 'nearest' })
-  await nextTick()
+  if (!el) { rect.value = null; return }
   const r = el.getBoundingClientRect()
   if (r.width === 0 && r.height === 0) { rect.value = null; return }
   rect.value = { top: r.top, left: r.left, width: r.width, height: r.height, bottom: r.bottom, right: r.right }
+}
+
+// Called on open / step change: bring the target into view once, then measure.
+async function goToStep() {
+  await nextTick()
+  const el = currentEl()
+  if (el) el.scrollIntoView({ block: 'center', inline: 'nearest' })
+  await nextTick()
+  measure()
 }
 
 const holeStyle = computed(() => {
@@ -124,13 +140,14 @@ function unbind() {
   window.removeEventListener('resize', scheduleMeasure)
   window.removeEventListener('scroll', scheduleMeasure, true)
   observe(null)
+  observedEl = null
 }
 
 watch(() => props.open, (v) => {
   if (v) {
     stepIndex.value = 0
     bind()
-    nextTick(measure)
+    goToStep()
   } else {
     unbind()
     emit('step', null)
@@ -138,9 +155,8 @@ watch(() => props.open, (v) => {
 })
 
 watch(stepIndex, () => {
-  nextTick(measure)
-  // Re-measure after any async expansion / smooth-scroll settles (e.g. the
-  // Placed Symbols row expanding when the tour selects a symbol).
+  goToStep()
+  // Safety re-measure in case an expansion settles after the initial read.
   setTimeout(measure, 320)
 })
 watch(() => current.value?.target, (t) => emit('step', t ?? null))
