@@ -1057,7 +1057,7 @@ const tourSteps = [
   {
     logo: true,
     title: 'Welcome to Crest Foundry',
-    body: 'Forge a crest for any club — football, scholastic, recreational, social, role-playing, and more. Let’s take a quick lap around the forge.',
+    body: 'Forge a crest for any club — football, scholastic, recreational, social, role-playing, and more. Let’s take a quick lap around the foundry.',
   },
   {
     target: 'forge',
@@ -1069,13 +1069,13 @@ const tourSteps = [
     target: 'crest',
     placement: 'left',
     title: 'Make It Yours',
-    body: '<strong>Drag</strong> symbols and text right on the crest to arrange them. Arrow keys nudge; <strong>Shift+Arrow</strong> jumps 10px.',
+    body: '<strong>Drag</strong> symbols and text right on the crest to arrange them. Arrow keys nudge; <strong>Shift+Arrow</strong> jumps 10px. Copy &amp; paste with <strong>⌘C / ⌘V</strong>.',
   },
   {
     target: 'colors',
     placement: 'left',
     title: 'Club Colors',
-    body: 'Pick a real club’s palette, or hit <strong>Recast Colors</strong> to roll a fresh one. Every color updates across the whole crest.',
+    body: 'Pick a real club’s palette, or hit <strong>Recast Colors</strong> to roll a fresh one — or <strong>click any swatch</strong> to choose your own. Every color updates across the whole crest.',
   },
   {
     target: 'shape',
