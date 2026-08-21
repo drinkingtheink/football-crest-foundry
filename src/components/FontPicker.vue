@@ -11,7 +11,9 @@ let baseline = ''   // last committed font — the revert target when closing wi
 const triggerRef = ref(null)
 const panelRef = ref(null)
 const listRef = ref(null)
+const searchRef = ref(null)
 const panelStyle = ref({})
+const cursorFamily = ref('')   // keyboard-browse highlight; previews like hover
 let io = null
 
 // Font names are rendered in their own typeface, but the actual font files load
@@ -52,10 +54,12 @@ function observeRows() {
 async function openPanel() {
   open.value = true
   baseline = props.value
+  cursorFamily.value = props.value   // arrows move relative to the current font
   if (props.value) loadFont(props.value)
   await nextTick()
   position()
   observeRows()
+  searchRef.value?.focus()
   window.addEventListener('scroll', reposition, true)
   window.addEventListener('resize', reposition)
 }
@@ -65,6 +69,7 @@ function closePanel() {
   if (props.value !== baseline) emit('preview', baseline)
   open.value = false
   search.value = ''
+  cursorFamily.value = ''
   io?.disconnect(); io = null
   window.removeEventListener('scroll', reposition, true)
   window.removeEventListener('resize', reposition)
@@ -85,6 +90,42 @@ function choose(family) {
   loadFont(family)
 }
 
+// Keyboard browsing: arrows walk the visible list and live-preview each font,
+// exactly like hovering; Enter commits the highlighted one.
+const flatFamilies = computed(() => groups.value.flatMap(g => g.items.map(f => f.family)))
+
+function scrollCursorIntoView() {
+  nextTick(() => {
+    listRef.value?.querySelector(`[data-family="${cursorFamily.value}"]`)
+      ?.scrollIntoView({ block: 'nearest' })
+  })
+}
+function cursorMove(dir) {
+  const list = flatFamilies.value
+  if (!list.length) return
+  const at = list.indexOf(cursorFamily.value)
+  const next = at === -1
+    ? (dir > 0 ? 0 : list.length - 1)
+    : Math.max(0, Math.min(list.length - 1, at + dir))
+  cursorFamily.value = list[next]
+  previewFont(cursorFamily.value)
+  scrollCursorIntoView()
+}
+function commitCursor() {
+  if (!cursorFamily.value) return
+  choose(cursorFamily.value)
+  closePanel()
+}
+// Keys typed in the search field are stopped from reaching app shortcuts (as
+// before), but arrows/Enter/Escape drive the browse here.
+function onSearchKey(e) {
+  if (e.key === 'ArrowDown') { e.preventDefault(); cursorMove(1) }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); cursorMove(-1) }
+  else if (e.key === 'Enter') { e.preventDefault(); commitCursor() }
+  else if (e.key === 'Escape') { e.preventDefault(); closePanel() }
+  e.stopPropagation()
+}
+
 watch(groups, () => { if (open.value) nextTick(observeRows) })
 
 function onDocPointer(e) {
@@ -92,7 +133,15 @@ function onDocPointer(e) {
   if (triggerRef.value?.contains(e.target) || panelRef.value?.contains(e.target)) return
   closePanel()
 }
-function onKey(e) { if (e.key === 'Escape') closePanel() }
+function onKey(e) {
+  if (!open.value) return
+  if (e.key === 'Escape') { closePanel(); return }
+  // Search-field keys are handled by onSearchKey (stopped before reaching here);
+  // this covers browsing while focus is still on the trigger button.
+  if (e.key === 'ArrowDown') { e.preventDefault(); e.stopPropagation(); cursorMove(1) }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); cursorMove(-1) }
+  else if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); commitCursor() }
+}
 document.addEventListener('pointerdown', onDocPointer)
 document.addEventListener('keydown', onKey)
 onBeforeUnmount(() => {
@@ -112,11 +161,12 @@ onBeforeUnmount(() => {
     <Teleport to="body">
       <div v-if="open" ref="panelRef" class="fp-panel" :style="panelStyle">
         <input
+          ref="searchRef"
           v-model="search"
           class="fp-search"
           type="text"
           placeholder="Search fonts…"
-          @keydown.stop
+          @keydown="onSearchKey"
         />
         <div ref="listRef" class="fp-list">
           <template v-for="g in groups" :key="g.group">
@@ -126,7 +176,7 @@ onBeforeUnmount(() => {
               :key="f.family"
               type="button"
               class="fp-item"
-              :class="{ active: f.family === value }"
+              :class="{ active: f.family === value, cursor: f.family === cursorFamily }"
               :data-family="f.family"
               :style="{ fontFamily: f.family }"
               @mouseenter="previewFont(f.family)"
@@ -216,6 +266,7 @@ onBeforeUnmount(() => {
   text-overflow: ellipsis;
 }
 .fp-item:hover { background: #1e1e28; }
+.fp-item.cursor { background: #1e1e28; box-shadow: inset 0 0 0 1px var(--accent-warm); }
 .fp-item.active { background: rgba(232, 200, 74, 0.14); color: #e8c84a; }
 .fp-empty { padding: 12px 8px; font-size: 12px; color: #888; }
 </style>
